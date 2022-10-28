@@ -1,5 +1,9 @@
 from imports import *
 
+def add_model_location():
+    if not os.path.isdir('models'):
+        os.mkdir('models')
+
 def train_grid():
 
     start_time = perf_counter()
@@ -96,6 +100,7 @@ def train_grid():
 
     # Evaluate neural network performance and save
     model.evaluate(x_test,  y_test, verbose=2)
+    add_model_location()
     model.save(grid_model_location)
 
     print(f"Grid training: {round(perf_counter()-start_time,1)}s")
@@ -181,6 +186,7 @@ def train_digits():
 
     #Evaluating and saving model
     model.evaluate(x_test,  y_test, verbose=2)
+    add_model_location()
     model.save(digit_model_location)
 
     print(f"Digit training: {round(perf_counter()-start_time,1)}s")
