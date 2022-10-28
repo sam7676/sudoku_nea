@@ -1,4 +1,3 @@
-from time import sleep
 from time import perf_counter
 import os
 from PIL import Image
@@ -6,14 +5,10 @@ from PIL import ImageGrab
 from PIL import ImageTk
 import random
 import cv2
-import requests
-from bs4 import BeautifulSoup
 import tensorflow as tf
 import numpy as np
 import clipboard
-import pyautogui as pg
 from itertools import product
-import sys
 import matplotlib.pyplot as plt
 import statistics
 import tkinter as tk
@@ -21,7 +16,6 @@ from tkinter.filedialog import askopenfilename
 import sqlite3
 from datetime import date
 from tkinter import font
-from tkinter import ttk
 
 img_size = 500                  #size of potential grids
 digit_size = img_size//10       #size of potential digits
