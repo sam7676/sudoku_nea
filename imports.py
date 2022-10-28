@@ -8,6 +8,7 @@ import cv2
 import tensorflow as tf
 import numpy as np
 import clipboard
+import pyautogui as pg                          # This for some reason modifies the font
 from itertools import product
 import matplotlib.pyplot as plt
 import statistics
