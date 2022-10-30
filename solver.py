@@ -110,7 +110,10 @@ def store_grid(grid):
     for i in range(len(grid)):
         temp2 = [][:]
         for j in range(len(grid[i])):
-            temp2.append(grid[i][j][:])
+            if type(grid[i][j])==list:
+                temp2.append(grid[i][j][:])
+            else:
+                temp2.append(grid[i][j])
         temp.append(temp2[:])
     return temp
 def row_column_box(grid,y1,x1): 
@@ -131,7 +134,8 @@ class constraint:
         grid = create_grid(nums)
         x.moves,x.move_toggle=[],False
         x.ans = x.start(grid)
-        print(f'Constraint solver: {round(perf_counter()-start_time,6)}s')
+        x.time = perf_counter()-start_time
+        print(f'Constraint solver: {round(x.time,6)}s')
     def return_cords(x,grid):
         #Returns co-ordinates of the cell with the minimal notes in it. Used for bowman
         for a in range(2,9+1):
@@ -486,12 +490,16 @@ class algorithm_x:
                         X[k].add(i)
 
 class generate(algorithm_x):
-    def __init__(x):
+    def __init__(x,attempts):
         start_time = perf_counter()
         final_grid = x.generate_complete()
-        ans = (x.remove_complete(final_grid))
+        hardest_generate = []
+        for i in range(attempts[1]):
+            ans = x.remove_complete(store_grid(final_grid),attempts[0])
+            hardest_generate.append([ans,constraint(export_answer(ans)).time])
+        hardest_generate.sort(key=lambda x: x[1])
         print(f"Generator: {round(perf_counter()-start_time,6)}s")
-        x.ans = export_answer(ans) 
+        x.ans = export_answer(hardest_generate[-1][0]) 
     def generate_complete(x):
 
         #Create grid
@@ -517,10 +525,10 @@ class generate(algorithm_x):
                     grid[cords[0]][cords[1]]=0
             except:
                 grid[cords[0]][cords[1]]=0        
-    def remove_complete(x,grid):
+    def remove_complete(x,grid,attempts):
 
         #Attempt to remove cells and minimise the unique solution 
-        for a in range(generate_attempts):
+        for a in range(attempts):
             i=random.randint(0,8)
             j=random.randint(0,8)
             k=grid[i][j]

@@ -68,7 +68,7 @@ class front_end:
         #Buttons
         customB = tk.Button(text='Create custom',command=x.s_create_custom_game,
             font=f_main,width=w,height=2,relief=play_relief)
-        generateB = tk.Button(text='Generate',command=lambda:x.s_game(generate().ans),
+        generateB = tk.Button(text='Generate',command=x.s_generate,
             font=f_main,width=w,height=2,relief=play_relief)
         uploadB = tk.Button(text='Upload',command=x.s_upload_stage_1,
             font=f_main,width=w,height=2,relief=play_relief)
@@ -362,6 +362,40 @@ class front_end:
         x.query_frame = tk.Frame()
 
         x.win.mainloop()
+    def s_generate(x):
+        x.win.destroy()
+        x.win = tk.Tk()
+        x.win.title('')
+        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
+        x.win.iconphoto(False, o1x1_logo)
+        f_main = font.Font(family="TkDefaultFont",size=11,weight="normal")
+        w=41
+        diff_w = 20
+
+        
+        generate_image = ImageTk.PhotoImage(Image.open(img_generate))
+        generateL = tk.Label(image=generate_image)
+        diff_frame = tk.Frame()        
+        diffs=[[20,1],[50,1],[150,1],[500,1],[500,3],[500,10]]
+
+        
+        diff_array = [tk.Button(master=diff_frame,text='Level 1',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[0]).ans)),
+                      tk.Button(master=diff_frame,text='Level 2',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[1]).ans)),  
+                      tk.Button(master=diff_frame,text='Level 3',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[2]).ans)),  
+                      tk.Button(master=diff_frame,text='Level 4',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[3]).ans)),
+                      tk.Button(master=diff_frame,text='Level 5',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[4]).ans)),
+                      tk.Button(master=diff_frame,text='Level 6',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[5]).ans)),  ]
+
+        for i in range(len(diff_array)):
+            diff_array[i].grid(row=i//2,column=i%2)
+
+        backB = tk.Button(text='Back',font=f_main,width=w,command=x.s_play_options,height=2)
+
+        generateL.grid(row=0)
+        diff_frame.grid(row=1)
+        
+        backB.grid(row=3)
+        x.win.mainloop()
     def s_win(x):
         x.final_time = perf_counter() - x.timer_start
         x.final_grid = x.grid_input
@@ -375,7 +409,10 @@ class front_end:
         win_img = ImageTk.PhotoImage(Image.open(img_win),master=x.win_window)
         win_label = tk.Label(master=x.win_window,image=win_img)
 
-        time_label = tk.Label(master=x.win_window,text=f'Time taken: {round(x.final_time,2)}s',
+        final_mins = int(x.final_time//60)
+        final_secs = int(round(x.final_time%60))
+
+        time_label = tk.Label(master=x.win_window,text=f'Time taken: {final_mins}m {final_secs}s',
             font=("TkDefaultFont","10"),width=width1)
         name_label = tk.Label(master=x.win_window,text='Enter name [max 16 characters]:',
             font=("TkDefaultFont","10"),width=width1)
@@ -731,14 +768,30 @@ class front_end:
         emptyLbl.grid(row=0,column=4)
 
         if len(results)!=0:
+            try:
+                results_queries.append([tk.Label(text=results[0][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[0][1],master=x.query_frame,anchor="w",width=grid_w,font=f_main),tk.Label(text=results[0][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f"{int(results[0][3]//60)}m {int(round(results[0][3]%60))}s",master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[0][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[1][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[1][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[1][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[1][3]//60)}m {int(round(results[1][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[1][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[2][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[2][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[2][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[2][3]//60)}m {int(round(results[2][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[2][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[3][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[3][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[3][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[3][3]//60)}m {int(round(results[3][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[3][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[4][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[4][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[4][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[4][3]//60)}m {int(round(results[4][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[4][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[5][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[5][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[5][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[5][3]//60)}m {int(round(results[5][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[5][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[6][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[6][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[6][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[6][3]//60)}m {int(round(results[6][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[6][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[7][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[7][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[7][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[7][3]//60)}m {int(round(results[7][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[7][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[8][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[8][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[8][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[8][3]//60)}m {int(round(results[8][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[8][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[9][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[9][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[9][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[9][3]//60)}m {int(round(results[9][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[9][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[10][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[10][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[10][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[10][3]//60)}m {int(round(results[10][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[10][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[11][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[11][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[11][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[11][3]//60)}m {int(round(results[11][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[11][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[12][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[12][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[12][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[12][3]//60)}m {int(round(results[12][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[12][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[13][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[13][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[13][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[13][3]//60)}m {int(round(results[13][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[13][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[14][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[14][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[14][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[14][3]//60)}m {int(round(results[14][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[14][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[15][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[15][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[15][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[15][3]//60)}m {int(round(results[15][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[15][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[16][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[16][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[16][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[16][3]//60)}m {int(round(results[16][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[16][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[17][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[17][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[17][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[17][3]//60)}m {int(round(results[17][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[17][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[18][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[18][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[18][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[18][3]//60)}m {int(round(results[18][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[18][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+                results_queries.append([tk.Label(text=results[19][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[19][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[19][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[19][3]//60)}m {int(round(results[19][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[19][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
+            except:
+                pass
 
-            for res in results:
-                results_queries.append([tk.Label(text=res[0],master=x.query_frame,width=name_w,font=f_main),
-                    tk.Label(text=res[1],master=x.query_frame,anchor="w",width=grid_w,font=f_main),
-                    tk.Label(text=res[2],master=x.query_frame,width=date_w,font=f_main),
-                    tk.Label(text=res[3],master=x.query_frame,width=time_w,font=f_main),
-                    tk.Button(text='Play',command=lambda:x.s_game(res[1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            
             for i, result in enumerate(results_queries):
                 for j in range(len(result)):
                     result[j].grid(row=i+1,column=j)
