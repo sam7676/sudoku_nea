@@ -182,7 +182,7 @@ def train_digits():
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                 metrics=['accuracy'])
 
-    model.fit(x_train, y_train, epochs=20)
+    model.fit(x_train, y_train, epochs=15)
 
     #Evaluating and saving model
     model.evaluate(x_test,  y_test, verbose=2)
