@@ -17,7 +17,7 @@ def search_result(name,grid):
     cur = con.cursor()
 
     k = cur.execute('''SELECT * FROM results WHERE name LIKE ? AND grid LIKE ? ORDER BY time''',(name+'%',grid+'%',))
-    result = k.fetchmany(50)
+    result = k.fetchmany(15)
     cur.close()
     con.close()
     return result
