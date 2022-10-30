@@ -38,6 +38,7 @@ img_win =               'images\\win.png'
 img_debug =             'images\\debug.png'
 img_generate =          'images\\generate.png'
 img_1x1 =               'images\\1x1.png'
+img_custom =            'images\\custom.png'
 database_location =     'leaderboard.sqlite3'
 
 move_dict = {
