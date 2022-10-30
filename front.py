@@ -94,6 +94,10 @@ class front_end:
         f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
         label_w = 14
 
+        custom_image = ImageTk.PhotoImage(Image.open(img_custom))
+        custom_label = tk.Label(image=custom_image)
+        custom_label.grid(row=0)
+
         #Frame setup
         frame1 = tk.Frame()
         frame2 = tk.Frame()
@@ -118,8 +122,8 @@ class front_end:
         x.confirmB.grid(row=0,column=1)
 
         #GUI final
-        frame1.grid(row=0,column=0)
-        frame2.grid(row=1,column=0)
+        frame1.grid(row=1,column=0)
+        frame2.grid(row=2,column=0)
         x.win.mainloop()
     def s_upload_stage_1(x):
         x.win.destroy()
@@ -464,7 +468,7 @@ class front_end:
             #Getting grid from entries (dtype: array, 2D, string items)
             grid=[]
             for i in x.entries:
-                grid.append([i.get()])
+                grid.append([i.get().strip()])
 
             #Checking that length = 1 in all cases and only 123456789 appear
             errors=False
@@ -497,7 +501,7 @@ class front_end:
                     x.s_game(grid2)
                 elif upload==None and k.sols==2:
                     x.confirmB["fg"]='#000000'
-                    y = random.randint(0,len(x.diffs))
+                    y = random.randint(0,len(x.diffs)-1)
                     print(f'Difficulty level: {y+1}')
                     x.s_game(generate(x.diffs[y],grid2).ans)
                     
