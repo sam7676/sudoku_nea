@@ -723,6 +723,9 @@ class front_end:
             item = tk.Label(text=f"{x.game_solution.ans[i]}",master=item.master,width=3,bg='#ffffff',font=f_label)
             item.grid(row=y1%3,column=x1%3)
 
+        for i in range(9):
+            x.usedNumLabels[i]["text"]=' '
+
         x.checkB['fg']='#ff0000'
         x.hintB['fg']='#ff0000'
         x.solveB['fg']='#ff0000'
