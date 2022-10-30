@@ -20,6 +20,9 @@ class front_end:
         f_title = font.Font(family="TkDefaultFont",size=12,weight="normal")
         f_name = font.Font(family="TkDefaultFont",size=11,weight="normal")
 
+        #Shared attribute
+        x.diffs=[[20,1],[50,1],[150,1],[500,1],[500,3],[500,10]]
+
         #Logo
         logo = ImageTk.PhotoImage(Image.open(img_logo))
         logoL = tk.Label(image=logo)
@@ -82,7 +85,7 @@ class front_end:
         backB.grid(row=4)
 
         x.win.mainloop()
-    def s_create_custom_game(x,grid=None):
+    def s_create_custom_game(x):
         x.win.destroy()
         x.win = tk.Tk()
         x.win.title('')
@@ -98,12 +101,7 @@ class front_end:
         #Grid setup and placing
         sg=[tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1)]
         x.entries = [tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3)]
-        
-        if grid!=None:
-            for i in range(len(x.entries)):
-                if grid[i]!='0':
-                    x.entries[i].insert(0,grid[i])
-        
+   
         for i,item in enumerate(x.entries):
             y1 = i//9
             x1 = i%9
@@ -376,15 +374,15 @@ class front_end:
         generate_image = ImageTk.PhotoImage(Image.open(img_generate))
         generateL = tk.Label(image=generate_image)
         diff_frame = tk.Frame()        
-        diffs=[[20,1],[50,1],[150,1],[500,1],[500,3],[500,10]]
+        
 
         
-        diff_array = [tk.Button(master=diff_frame,text='Level 1',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[0]).ans)),
-                      tk.Button(master=diff_frame,text='Level 2',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[1]).ans)),  
-                      tk.Button(master=diff_frame,text='Level 3',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[2]).ans)),  
-                      tk.Button(master=diff_frame,text='Level 4',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[3]).ans)),
-                      tk.Button(master=diff_frame,text='Level 5',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[4]).ans)),
-                      tk.Button(master=diff_frame,text='Level 6',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(diffs[5]).ans)),  ]
+        diff_array = [tk.Button(master=diff_frame,text='Level 1',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[0]).ans)),
+                      tk.Button(master=diff_frame,text='Level 2',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[1]).ans)),  
+                      tk.Button(master=diff_frame,text='Level 3',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[2]).ans)),  
+                      tk.Button(master=diff_frame,text='Level 4',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[3]).ans)),
+                      tk.Button(master=diff_frame,text='Level 5',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[4]).ans)),
+                      tk.Button(master=diff_frame,text='Level 6',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[5]).ans)),  ]
 
         for i in range(len(diff_array)):
             diff_array[i].grid(row=i//2,column=i%2)
@@ -482,13 +480,13 @@ class front_end:
                         grid[i]='0'
                     else:
                         grid[i]=grid[i][0]
-            
             #if there are any errors, exit. otherwise:
             if errors==False:
                 
                 #Finalising grid, checking only 1 solution, executing
                 grid2 = ''.join(grid)
                 k = algorithm_x(grid2,solving='')
+                print(f"Solutions: {k.sols}")
                 if k.sols == 1:
                     
                     #If upload is enabled, save information
@@ -497,6 +495,12 @@ class front_end:
                             upload.train(grid)
 
                     x.s_game(grid2)
+                elif upload==None and k.sols==2:
+                    x.confirmB["fg"]='#000000'
+                    y = random.randint(0,len(x.diffs))
+                    print(f'Difficulty level: {y+1}')
+                    x.s_game(generate(x.diffs[y],grid2).ans)
+                    
                 else:
 
                     #modify confirm text to red
