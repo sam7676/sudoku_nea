@@ -498,6 +498,8 @@ class generate(algorithm_x):
             ans = x.remove_complete(store_grid(final_grid),attempts[0])
             hardest_generate.append([ans,constraint(export_answer(ans)).time])
         hardest_generate.sort(key=lambda x: x[1])
+        if attempts[1]>1:
+            ans = x.remove_complete(hardest_generate[0][0],attempts[0])
         print(f"Generator: {round(perf_counter()-start_time,6)}s")
         x.ans = export_answer(hardest_generate[-1][0]) 
     def generate_complete(x,grid_inp):
