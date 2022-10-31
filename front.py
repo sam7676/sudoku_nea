@@ -451,10 +451,10 @@ class front_end:
         debugL = tk.Label(image=debug_image)
 
         w=30
-        train_digits_b = tk.Button(text='Train digits',font=f_main,command=train_digits,width=w)
-        train_grid_b = tk.Button(text='Train grid',font=f_main,command=train_grid,width=w)
-        clear_LB_b = tk.Button(text='Clear leaderboard',font=f_main,command=clear_table,width=w)
-        backB = tk.Button(text='Back',command=x.s_home,font=f_main,width=w)
+        train_digits_b = tk.Button(text='Train digits',font=f_main,command=train_digits,width=w,height=2)
+        train_grid_b = tk.Button(text='Train grid',font=f_main,command=train_grid,width=w,height=2)
+        clear_LB_b = tk.Button(text='Clear leaderboard',font=f_main,command=clear_table,width=w,height=2)
+        backB = tk.Button(text='Back',command=x.s_home,font=f_main,width=w,height=2)
 
         debugL.grid(row=0,column=0)
         train_digits_b.grid(row=1)
