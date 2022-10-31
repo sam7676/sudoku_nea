@@ -7,11 +7,13 @@ from database import *
 class front_end:
     def __init__(x): #init
         x.win=tk.Tk()
+        x.win.resizable(False, False)
         x.s_home()
     def s_home(x): #home page
         x.win.destroy()
         x.win = tk.Tk()
         x.win.title('')
+        x.win.resizable(False, False)
         o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
         x.win.iconphoto(False, o1x1_logo)
 
@@ -56,6 +58,7 @@ class front_end:
         x.win.destroy()
         x.win = tk.Tk()
         x.win.title('')
+        x.win.resizable(False, False)
         o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
         x.win.iconphoto(False, o1x1_logo)
         w=42
@@ -89,6 +92,7 @@ class front_end:
         x.win.destroy()
         x.win = tk.Tk()
         x.win.title('')
+        x.win.resizable(False, False)
         o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
         x.win.iconphoto(False, o1x1_logo)
         f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
@@ -129,6 +133,7 @@ class front_end:
         x.win.destroy()
         x.win = tk.Tk()
         x.win.title('')
+        x.win.resizable(False, False)
         o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
         x.win.iconphoto(False, o1x1_logo)
         play_relief = tk.RAISED
@@ -166,6 +171,7 @@ class front_end:
             x.win.destroy()
             x.win = tk.Tk()
             x.win.title('')
+            x.win.resizable(False, False)
             o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
             x.win.iconphoto(False, o1x1_logo)
             frame0 = tk.Frame()
@@ -227,6 +233,7 @@ class front_end:
         x.win.destroy()
         x.win = tk.Tk()
         x.win.title('')
+        x.win.resizable(False, False)
         o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
         x.win.iconphoto(False, o1x1_logo)
         frame1 = tk.Frame()
@@ -320,6 +327,7 @@ class front_end:
         x.win.destroy()
         x.win = tk.Tk()
         x.win.title('')
+        x.win.resizable(False, False)
         o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
         x.win.iconphoto(False, o1x1_logo)
         f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
@@ -368,6 +376,7 @@ class front_end:
         x.win.destroy()
         x.win = tk.Tk()
         x.win.title('')
+        x.win.resizable(False, False)
         o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
         x.win.iconphoto(False, o1x1_logo)
         f_main = font.Font(family="TkDefaultFont",size=11,weight="normal")
@@ -401,10 +410,13 @@ class front_end:
     def s_win(x):
         x.final_time = perf_counter() - x.timer_start
         x.final_grid = x.grid_input
-        x.win_window = tk.Tk()
-        x.win.title('')
-        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
-        x.win.iconphoto(False, o1x1_logo)
+        x.win_window = tk.Toplevel()
+        x.win_window.title('')
+        x.win_window.resizable(False, False)
+
+        ww_o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
+
+        x.win_window.iconphoto(False, ww_o1x1_logo)
 
         width1=48
         #New win window
@@ -443,6 +455,7 @@ class front_end:
         x.win.destroy()
         x.win = tk.Tk()
         x.win.title('')
+        x.win.resizable(False,False)
         o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
         x.win.iconphoto(False, o1x1_logo)
         f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
