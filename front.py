@@ -21,7 +21,7 @@ class front_end:
         f_name = font.Font(family="TkDefaultFont",size=11,weight="normal")
 
         #Shared attribute
-        x.diffs=[[20,1],[50,1],[150,1],[500,1],[500,3],[500,10]]
+        x.diffs=[[1,1],[5,1],[30,1],[100,1],[150,3],[200,10]]
 
         #Logo
         logo = ImageTk.PhotoImage(Image.open(img_logo))
