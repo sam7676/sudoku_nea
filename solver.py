@@ -491,15 +491,18 @@ class algorithm_x:
 
 class generate(algorithm_x):
     def __init__(x,attempts,grid_inp='000000000000000000000000000000000000000000000000000000000000000000000000000000000'):
+        
         start_time = perf_counter()
+        grid_inp = flatten(grid_inp)
         final_grid = x.generate_complete(grid_inp)
+        
         hardest_generate = []
         for i in range(attempts[1]):
-            ans = x.remove_complete(store_grid(final_grid),attempts[0])
+            ans = x.remove_complete(store_grid(final_grid),attempts[0],grid_inp)
             hardest_generate.append([ans,constraint(export_answer(ans)).time])
         hardest_generate.sort(key=lambda x: x[1])
         if attempts[1]>1:
-            ans = x.remove_complete(hardest_generate[0][0],attempts[0])
+            ans = x.remove_complete(hardest_generate[0][0],attempts[0],grid_inp)
         print(f"Generator: {round(perf_counter()-start_time,6)}s")
         x.ans = export_answer(hardest_generate[-1][0]) 
     def generate_complete(x,grid_inp):
@@ -515,6 +518,8 @@ class generate(algorithm_x):
             #If grid has 2 solutions, keep going (non-unique valid solution)
 
             cords = cord_locs[random.randint(0,len(cord_locs)-1)]
+            if grid_inp[9*cords[0]+cords[1]]!='0':
+                continue
             num = random.randint(1,9)
             grid[cords[0]][cords[1]] = num
             try:
@@ -527,12 +532,14 @@ class generate(algorithm_x):
                     grid[cords[0]][cords[1]]=0
             except:
                 grid[cords[0]][cords[1]]=0        
-    def remove_complete(x,grid,attempts):
+    def remove_complete(x,grid,attempts,original):
 
         #Attempt to remove cells and minimise the unique solution 
         for a in range(attempts):
             i=random.randint(0,8)
             j=random.randint(0,8)
+            if original[9*i+j]!='0':
+                continue
             k=grid[i][j]
             grid[i][j] = 0
             x.solving(grid,'solution')
