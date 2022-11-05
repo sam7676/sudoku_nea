@@ -23,7 +23,7 @@ class front_end:
         f_name = font.Font(family="TkDefaultFont",size=11,weight="normal")
 
         #Shared attribute
-        x.diffs=[[1,1],[5,1],[30,1],[100,1],[150,3],[200,10]]
+        
 
         #Logo
         logo = ImageTk.PhotoImage(Image.open(img_logo))
@@ -381,7 +381,6 @@ class front_end:
         x.win.iconphoto(False, o1x1_logo)
         f_main = font.Font(family="TkDefaultFont",size=11,weight="normal")
         w=41
-        diff_w = 20
 
         
         generate_image = ImageTk.PhotoImage(Image.open(img_generate))
@@ -390,15 +389,13 @@ class front_end:
         
 
         
-        diff_array = [tk.Button(master=diff_frame,text='Level 1',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[0]).ans)),
-                      tk.Button(master=diff_frame,text='Level 2',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[1]).ans)),  
-                      tk.Button(master=diff_frame,text='Level 3',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[2]).ans)),  
-                      tk.Button(master=diff_frame,text='Level 4',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[3]).ans)),
-                      tk.Button(master=diff_frame,text='Level 5',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[4]).ans)),
-                      tk.Button(master=diff_frame,text='Level 6',width=diff_w,font=f_main,height=2,command=lambda:x.s_game(generate(x.diffs[5]).ans)),  ]
+        diff_array = [tk.Button(master=diff_frame,text='Level 1',width=w,font=f_main,height=2,command=lambda:x.s_game(generate(gen_difficulty[0]).ans)),
+                      tk.Button(master=diff_frame,text='Level 2',width=w,font=f_main,height=2,command=lambda:x.s_game(generate(gen_difficulty[1]).ans)),  
+                      tk.Button(master=diff_frame,text='Level 3',width=w,font=f_main,height=2,command=lambda:x.s_game(generate(gen_difficulty[2]).ans)),  
+                      tk.Button(master=diff_frame,text='Level 4',width=w,font=f_main,height=2,command=lambda:x.s_game(generate(gen_difficulty[3]).ans)),]
 
         for i in range(len(diff_array)):
-            diff_array[i].grid(row=i//2,column=i%2)
+            diff_array[i].grid(row=i)
 
         backB = tk.Button(text='Back',font=f_main,width=w,command=x.s_play_options,height=2)
 
@@ -514,9 +511,9 @@ class front_end:
                     x.s_game(grid2)
                 elif upload==None and k.sols==2:
                     x.confirmB["fg"]='#000000'
-                    y = random.randint(0,len(x.diffs)-1)
+                    y = random.randint(0,len(gen_difficulty)-1)
                     print(f'Difficulty level: {y+1}')
-                    x.s_game(generate(x.diffs[y],grid2).ans)
+                    x.s_game(generate(gen_difficulty[y],grid2).ans)
                     
                 else:
 
