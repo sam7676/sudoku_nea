@@ -96,7 +96,7 @@ def train_grid():
         metrics=["accuracy"]
     )
 
-    model.fit(x_train, y_train, epochs=15)
+    model.fit(x_train, y_train, epochs=epoch_rate)
 
     # Evaluate neural network performance and save
     model.evaluate(x_test,  y_test, verbose=2)
@@ -182,7 +182,7 @@ def train_digits():
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                 metrics=['accuracy'])
 
-    model.fit(x_train, y_train, epochs=15)
+    model.fit(x_train, y_train, epochs=epoch_rate)
 
     #Evaluating and saving model
     model.evaluate(x_test,  y_test, verbose=2)
