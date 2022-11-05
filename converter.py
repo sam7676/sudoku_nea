@@ -55,8 +55,6 @@ class convert:
         print(f'Grid prediction confidence: {round(x.max_predict/0.01,1)}%')
         max_img = imgs[img_preds.index(x.max_predict)]
         x.img = max_img
-        if x.saving==True:
-            max_img.save(f'{grid_location}\\1\\{x.max_predict}{get_name()}.png')
         results = ''
 
         #Split the grid into 81 squares of equal area. These are expected to be the cells.
@@ -143,6 +141,10 @@ class convert:
         # to their corresponding folders and print accuracy of prediction
         accuracy=0
         solution = flatten(solution)
+
+        if x.saving==True:
+            x.img.save(f'{grid_location}\\1\\{x.max_predict}{get_name()}.png')
+
         for img_arr in x.digit_array:
             if x.saving==True:
                 img_arr[0].save(f'{digit_location}\\{solution[9*img_arr[2]+img_arr[1]]}\\{get_name()}.png')
