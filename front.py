@@ -807,6 +807,9 @@ class front_end:
                 results_queries.append([tk.Label(text=results[14][0],master=x.query_frame,width=name_w,font=f_main),tk.Label(text=results[14][1],master=x.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[14][2],master=x.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[14][3]//60)}m {int(round(results[14][3]%60))}s',master=x.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:x.s_game(results[14][1]),master=x.query_frame,width=play_w,font=f_main,relief=title_relief)])
             except:
                 pass
+            
+            for i in range(len(results_queries),15):
+                results_queries.append([tk.Label(text=' ',master=x.query_frame,width=name_w,font=f_main),tk.Label(text=' ',master=x.query_frame,anchor="w",width=grid_w,font=f_main),tk.Label(text=' ',master=x.query_frame,width=date_w,font=f_main),tk.Label(text=' ',master=x.query_frame,width=time_w,font=f_main),tk.Button(text=' ',master=x.query_frame,width=play_w,font=f_main,relief=tk.FLAT)])
 
             for i, result in enumerate(results_queries):
                 for j in range(len(result)):
