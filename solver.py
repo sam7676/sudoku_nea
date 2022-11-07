@@ -445,8 +445,7 @@ class algorithm_x:
             for solution in x.solve(X, Y, []):
                 for (r, c, n) in solution:
                     grid[r][c] = n
-                answers.append(export_answer(grid))
-            return answers
+                return export_answer(grid)
         else:
             for i in x.solve(X,Y,[]):
                 pass
