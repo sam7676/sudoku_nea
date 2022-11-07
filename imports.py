@@ -24,7 +24,7 @@ split_rate = 0.7                #splitting training and test data of NN
 pval = 0.999                    #minimal probability for a grid prediction to be accurate
 meanpval =0.5                   #mean of 5 items, if lower then terminate grid selection
 img_set = 5                     #size of stack for taking the mean of
-epoch_rate = 15
+epoch_rate = 15                 #number of iterations of neural network training
 generate_attempts = 100         #number of attempts generator should take to reduce solution
 gen_difficulty = [[0,1],[30,1],[100,2],[250,3]]
 grid_model_location =   'models\\grid_model.h5'
@@ -109,31 +109,47 @@ def expand(inp):
             a+=' '
     return a
 
-' list of functions:  '
-# convert.init(inp,debug=False)     -> returns grid input string from image with object detection           -> Time: True
-# convert.train(solution)           -> saves digits to digit folder                                         -> Time: False
-# create_grid(nums,complex)         -> returns grid object (2D if complex=False, 3D if complex=True)        -> Time: False
-# print_grid(grid)                  -> prints grid from either either 3D object or string                   -> Time: False
-# export_answer(grid)               -> converts grid object to string export (2D or 3D)                     -> Time: False
-# store_grid(grid)                  -> returns duplicate grid object that                                   -> Time: False
-# constraint.init(nums)             -> uses constraint solver and returns string answer                     -> Time: True
-# constraint.next_move(nums)        -> given grid input, returns appended grid and hint array               -> Time: True
-# constraint.check_complete(grid)   -> returns true or false for whether grid is functional                 -> Time: False
-# algorithm_x.init(nums)            -> uses algorithm x solver and returns array of string answers (max 2)  -> Time: True
-# generate.init()                   -> returns valid string grid                                            -> Time: True
-# train_grid()                      -> trains from grid images in folder                                    -> Time: True
-# train_digits()                    -> trains from digit images in folder                                   -> Time: True
-# flatten(inp)                      -> returns string andremoves all spaces from string for formatting      -> Time: False
-# expand(inp)                       -> returns string and adds spaces to string for readability             -> Time: False
-# add_result(name,grid,time,date)   -> adds name, grid, time, date to database                              -> Time: False
-# search_result(name,grid)          -> returns query of name and grid, ordered by time                      -> Time: False
-# front_end.init()                  -> returns front end program                                            -> Time: False
-# clear_table()                     -> deletes and creates SQL table, effectively wiping it                 -> Time: False
+' list of subroutines:  '
 
-' useful objects'
+' converter.py:                     '
+# convert.init(inp,debug=False)     -> uses object detection network, returns grid string                           -> Time: True
+# convert.train(solution)           -> saves digits to digit folder and grid to grid folder if saving allowed       -> Time: False
+
+' database.py:                      '
+# add_result(name,grid,date,time)   -> adds result in shown format to SQL table                                     -> Time: False
+# search_result(name,grid)          -> returns SQL query for the name and/or the grid. First 15 items               -> Time: False
+# clear_table()                     -> deletes and creates SQL table, effectively wiping it                         -> Time: False
+
+' front.py:                         '
+# front_end.init()                  -> initiates front end of program                                               -> Time: False
+
+' imports.py                        '
+# resize_images(image,img_size)     -> returns new image and whether resize has taken place or not                  -> Time: False
+# get_name()                        -> returns random string of 16 characters used for naming conventions           -> Time: False
+# flatten(inp)                      -> returns string and removes all spaces from string for formatting             -> Time: False
+# expand(inp)                       -> returns string and adds spaces to string for readability                     -> Time: False
+
+' solver.py                         '
+# create_grid(nums,complex)         -> returns grid object (2D if complex=False, 3D if complex=True)                -> Time: False
+# print_grid(grid)                  -> prints grid from either either 3D object or string                           -> Time: False
+# export_answer(grid)               -> converts grid object to string export (2D or 3D)                             -> Time: False
+# store_grid(grid)                  -> returns duplicate grid object that                                           -> Time: False
+# constraint.init(nums)             -> uses constraint solver and returns string answer                             -> Time: True
+# constraint.next_move(nums)        -> given grid input, returns appended grid and hint array                       -> Time: False
+# algorithm_x.init(nums)            -> uses algorithm x solver and returns array of string answers (max 2)          -> Time: True
+# generate.init()                   -> returns valid string grid                                                    -> Time: True
+
+' training.py                       '
+# train_grid()                      -> trains grid model from grid images in folder                                 -> Time: True
+# train_digits()                    -> trains digit model from digit images in folder                               -> Time: True
+
+' useful attributes                 '
+# convert.saving                    -> whether saving is allowed for current converter object
+# convert.ans                       -> conversion results (string)
+# convert.img                       -> most accurate grid image
 # constraint.ans                    -> constraint solver answer (string)
 # constraint.moves                  -> constraint move list (array) [ID, y, x, old, new, layers]
-# algorithm_x.ans                   -> algorithm x solver answer array of strings (array)
+# algorithm_x.ans                   -> algorithm x solver answer (string)
+# algorithm_x.sols                  -> algorithm x number of solutions
 # generate.ans                      -> generated grid (string)
-# convert.ans                       -> conversion results (string)
-# convert.img                       -> chosen grid image
+
