@@ -418,8 +418,10 @@ class algorithm_x:
         # This originates from another Sudoku solver, not made by me.
         # Its benefit over my developed algorithm (above) is that it is much faster 
         # due to it being a backtrack solver and independent of solution difficulty.
-        # However, I have stripped this algorithm of its solving features, 
+        # However, I have stripped this algorithm of its solving inputs/outputs, 
         # and it is now used to calculate the number of solutions a grid has near-instantly.
+
+        # Original code:                https://www.cs.mcgill.ca/~aassaf9/python/sudoku.txt
 
         start_time = perf_counter()
         grid = create_grid(nums,complex=False)
