@@ -413,22 +413,27 @@ class constraint:
         x.moves.append([3,y1,x1,g1,g2,layer])
 
 class algorithm_x:
-    def __init__(x,nums,solving='grid'):
+    def __init__(x,nums):
+
+        # This originates from another Sudoku solver, not made by me.
+        # Its benefit over my developed algorithm (above) is that it is much faster 
+        # due to it being a backtrack solver and independent of solution difficulty.
+        # However, I have stripped this algorithm of its solving features, 
+        # and it is now used to calculate the number of solutions a grid has near-instantly.
+
         start_time = perf_counter()
         grid = create_grid(nums,complex=False)
-        x.ans = x.solving(grid,solving)
-
+        x.ans = x.solving(grid)
         print(f"Algorithm X: {round(perf_counter()-start_time,6)}s")
-    def solving(x,grid,ans_type): #grid, solution
+    def solving(x,grid): #grid, solution
         x.sols=0
-        R, C, N = 3,3,9
-        X = ([("rc", rc) for rc in product(range(N), range(N))] +
-            [("rn", rn) for rn in product(range(N), range(1, N + 1))] +
-            [("cn", cn) for cn in product(range(N), range(1, N + 1))] +
-            [("bn", bn) for bn in product(range(N), range(1, N + 1))])
+        X = ([("rc", rc) for rc in product(range(9), range(9))] +
+            [("rn", rn) for rn in product(range(9), range(1, 9 + 1))] +
+            [("cn", cn) for cn in product(range(9), range(1, 9 + 1))] +
+            [("bn", bn) for bn in product(range(9), range(1, 9 + 1))])
         Y = dict()
-        for r, c, n in product(range(N), range(N), range(1, N + 1)):
-            b = (r // R) * R + (c // C) # Box number
+        for r, c, n in product(range(9), range(9), range(1, 9 + 1)):
+            b = (r // 3) * 3 + (c // 3) # Box number
             Y[(r, c, n)] = [
                 ("rc", (r, c)),
                 ("rn", (r, n)),
@@ -439,16 +444,8 @@ class algorithm_x:
             for j, n in enumerate(row):
                 if n:
                     x.select(X, Y, (i, j, n))
-        
-        if ans_type == 'grid':
-            answers = []
-            for solution in x.solve(X, Y, []):
-                for (r, c, n) in solution:
-                    grid[r][c] = n
-                return export_answer(grid)
-        else:
-            for i in x.solve(X,Y,[]):
-                pass
+        for i in x.solve(X,Y,[]):
+            pass
     def exact_cover(x,X, Y):
         X = {j: set() for j in X}
         for i, row in Y.items():
@@ -459,14 +456,14 @@ class algorithm_x:
         if not X:
             if x.sols<2:
                 x.sols+=1
-                yield list(solution)
+                yield
         else:
             c = min(X, key=lambda c: len(X[c]))
             for r in list(X[c]):
                 solution.append(r)
                 cols = x.select(X, Y, r)
                 for s in x.solve(X, Y, solution):
-                    yield s
+                    yield
                 x.deselect(X, Y, r, cols)
                 solution.pop()
                 if x.sols>=2:
@@ -516,20 +513,19 @@ class generate(algorithm_x):
             #If grid has 2 solutions, keep going (non-unique valid solution)
 
             cords = cord_locs[random.randint(0,len(cord_locs)-1)]
-            if grid_inp[9*cords[0]+cords[1]]!='0':
-                continue
-            num = random.randint(1,9)
-            grid[cords[0]][cords[1]] = num
-            try:
-                x.solving(grid,'solution')
-                if x.sols==2:
-                    cord_locs.remove(cords)
-                if x.sols==1:
-                    return grid
-                if x.sols==0:
-                    grid[cords[0]][cords[1]]=0
-            except:
-                grid[cords[0]][cords[1]]=0        
+            if grid_inp[9*cords[0]+cords[1]]=='0':
+                num = random.randint(1,9)
+                grid[cords[0]][cords[1]] = num
+                try:
+                    x.solving(grid)
+                    if x.sols==2:
+                        cord_locs.remove(cords)
+                    if x.sols==1:
+                        return grid
+                    if x.sols==0:
+                        grid[cords[0]][cords[1]]=0
+                except:
+                    grid[cords[0]][cords[1]]=0        
     def remove_complete(x,grid,attempts,original):
         
         changes = 0
@@ -541,7 +537,7 @@ class generate(algorithm_x):
                 continue
             k=grid[i][j]
             grid[i][j] = 0
-            x.solving(grid,'solution')
+            x.solving(grid)
             if x.sols!=1:
                 grid[i][j]=k
             else:
@@ -553,7 +549,7 @@ class generate(algorithm_x):
                     if grid[i][j]!=0:
                         k= grid[i][j]
                         grid[i][j]=0
-                        x.solving(grid,'solution')
+                        x.solving(grid)
                         if x.sols!=1:
                             grid[i][j]=k
                         
