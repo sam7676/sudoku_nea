@@ -499,7 +499,7 @@ class front_end:
                 
                 #Finalising grid, checking only 1 solution, executing
                 grid2 = ''.join(grid)
-                k = algorithm_x(grid2,solving='')
+                k = algorithm_x(grid2)
                 print(f"Solutions: {k.sols}")
                 if k.sols == 1:
                     
@@ -819,7 +819,7 @@ class front_end:
     def f_check_grid_string(x):
         try:
             stri = flatten(clipboard.paste())
-            k = algorithm_x(stri,solving='')
+            k = algorithm_x(stri)
             if k.sols==1:
                 x.s_game(stri)
             else:
