@@ -392,17 +392,7 @@ class constraint:
         for layer in range(max_layer+1):
             x.moves = flatten_layer(x.moves,layer)
         
-        #If potential answer not in current grid, edit current grid and return
-        for i in x.moves[0][4]:
-            if i not in grid[x.moves[0][1]][x.moves[0][2]]: 
-                moveK = [5,x.moves[0][1],x.moves[0][2],grid[x.moves[0][1]][x.moves[0][2]],x.moves[0][3]]
-                grid[x.moves[0][1]][x.moves[0][2]] = x.moves[0][3]
-
-                return [grid,[moveK]]
-
-        #Edit grid and return
-        grid[x.moves[0][1]][x.moves[0][2]] = x.moves[0][4]
-        return [grid,x.moves]
+        return x.moves[0]
     def find_change(x,listA,listB,num):
         #Find any changes to old list and new list and add to moves array
         for i in range(len(listA)):
