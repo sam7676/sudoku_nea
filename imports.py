@@ -136,6 +136,7 @@ def expand(inp):
 
 ' imports.py                        '
 # resize_images(image,img_size)     -> returns new image and whether resize has taken place or not                  -> Time: False
+# resize_stretch(image,img_size)    -> returns new image and whether resize has taken place or not                  -> Time: False
 # get_name()                        -> returns random string of 16 characters used for naming conventions           -> Time: False
 # flatten(inp)                      -> returns string and removes all spaces from string for formatting             -> Time: False
 # expand(inp)                       -> returns string and adds spaces to string for readability                     -> Time: False
