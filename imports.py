@@ -10,7 +10,6 @@ import numpy as np
 import clipboard
 import pyautogui as pg                          # This for some reason modifies the font
 from itertools import product
-import matplotlib.pyplot as plt
 import statistics
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
@@ -20,7 +19,7 @@ from tkinter import font
 
 img_size = 500                  #size of potential grids
 digit_size = img_size//10       #size of potential digits
-split_rate = 0.7                #splitting training and test data of NN
+split_rate = 0.8                #splitting training and test data of NN
 pval = 0.999                    #minimal probability for a grid prediction to be accurate
 meanpval =0.5                   #mean of 5 items, if lower then terminate grid selection
 img_set = 5                     #size of stack for taking the mean of
@@ -48,7 +47,6 @@ move_dict = {
     2:'Hint: Partner',
     3:'Hint: Bowman',
     4:'Hint: Remove note',
-    5:'Hint: Error',
 }
 
 def resize_images(image,img_size):
@@ -84,6 +82,19 @@ def resize_images(image,img_size):
         return [new_img,True]
     else:
         return [img,False]
+
+def resize_stretch(image,img_size):
+    if type(image)==str:
+        if '.png' in image or '.jpg' in image or '.jpeg' in image or '.gif' in image:
+            img = Image.open(image)
+        else:
+            img = ImageGrab.grabclipboard()
+    else:
+        img = image
+    
+    if img.size==(img_size,img_size):
+        return [img,False]
+    return [img.resize((img_size,img_size)),True]
 
 def get_name():
     #generates random name for file
@@ -136,7 +147,7 @@ def expand(inp):
 # store_grid(grid)                  -> returns duplicate grid object that                                           -> Time: False
 # constraint.init(nums)             -> uses constraint solver and returns string answer                             -> Time: True
 # constraint.next_move(nums)        -> given grid input, returns appended grid and hint array                       -> Time: False
-# algorithm_x.init(nums)            -> uses algorithm x solver and returns array of string answers (max 2)          -> Time: True
+# algorithm_x.init(nums)            -> initiates algorithm x solver                                                 -> Time: True
 # generate.init()                   -> returns valid string grid                                                    -> Time: True
 
 ' training.py                       '
@@ -149,7 +160,6 @@ def expand(inp):
 # convert.img                       -> most accurate grid image
 # constraint.ans                    -> constraint solver answer (string)
 # constraint.moves                  -> constraint move list (array) [ID, y, x, old, new, layers]
-# algorithm_x.ans                   -> algorithm x solver answer (string)
 # algorithm_x.sols                  -> algorithm x number of solutions
 # generate.ans                      -> generated grid (string)
 
