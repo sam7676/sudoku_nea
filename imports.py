@@ -123,37 +123,37 @@ def expand(inp):
 ' list of subroutines:  '
 
 ' converter.py:                     '
-# convert.init(inp)                 -> uses object detection network, returns grid string                           -> Time: True
-# convert.train(solution)           -> saves digits to digit folder and grid to grid folder if saving allowed       -> Time: False
+# convert.init(inp)                 -> uses object detection network, returns grid string                    
+# convert.train(solution)           -> saves digits to digit folder and grid to grid folder if saving allowed  
 
 ' database.py:                      '
-# add_result(name,grid,date,time)   -> adds result in shown format to SQL table                                     -> Time: False
-# search_result(name,grid)          -> returns SQL query for the name and/or the grid. First 15 items               -> Time: False
-# clear_table()                     -> deletes and creates SQL table, effectively wiping it                         -> Time: False
+# add_result(name,grid,date,time)   -> adds result in shown format to SQL table                       
+# search_result(name,grid)          -> returns SQL query for the name and/or the grid. First 15 items  
+# clear_table()                     -> deletes and creates SQL table, effectively wiping it 
 
 ' front.py:                         '
-# front_end.init()                  -> initiates front end of program                                               -> Time: False
+# front_end.init()                  -> initiates front end of program           
 
 ' imports.py                        '
-# resize_images(image,img_size)     -> returns new image and whether resize has taken place or not                  -> Time: False
-# resize_stretch(image,img_size)    -> returns new image and whether resize has taken place or not                  -> Time: False
-# get_name()                        -> returns random string of 16 characters used for naming conventions           -> Time: False
-# flatten(inp)                      -> returns string and removes all spaces from string for formatting             -> Time: False
-# expand(inp)                       -> returns string and adds spaces to string for readability                     -> Time: False
+# resize_images(image,img_size)     -> returns new image and whether resize has taken place or not      
+# resize_stretch(image,img_size)    -> returns new image and whether resize has taken place or not      
+# get_name()                        -> returns random string of 16 characters used for naming conventions 
+# flatten(inp)                      -> returns string and removes all spaces from string for formatting   
+# expand(inp)                       -> returns string and adds spaces to string for readability             
 
 ' solver.py                         '
-# create_grid(nums,complex)         -> returns grid object (2D if complex=False, 3D if complex=True)                -> Time: False
-# print_grid(grid)                  -> prints grid from either either 3D object or string                           -> Time: False
-# export_answer(grid)               -> converts grid object to string export (2D or 3D)                             -> Time: False
-# store_grid(grid)                  -> returns duplicate grid object that                                           -> Time: False
-# constraint.init(nums)             -> uses constraint solver and returns string answer                             -> Time: True
-# constraint.next_move(nums)        -> given grid input, returns appended grid and hint array                       -> Time: False
-# algorithm_x.init(nums)            -> initiates algorithm x solver                                                 -> Time: True
-# generate.init()                   -> returns valid string grid                                                    -> Time: True
+# create_grid(nums,complex)         -> returns grid object (2D if complex=False, 3D if complex=True)       
+# print_grid(grid)                  -> prints grid from either either 3D object or string                
+# export_answer(grid)               -> converts grid object to string export (2D or 3D)                        
+# store_grid(grid)                  -> returns duplicate grid object that                                        
+# constraint.init(nums)             -> uses constraint solver and returns string answer         
+# constraint.next_move(nums)        -> given grid input, returns appended grid and hint array    
+# algorithm_x.init(nums)            -> initiates algorithm x solver
+# generate.init()                   -> returns valid grid in string form  
 
 ' training.py                       '
-# train_grid()                      -> trains grid model from grid images in folder                                 -> Time: True
-# train_digits()                    -> trains digit model from digit images in folder                               -> Time: True
+# train_grid()                      -> trains grid model from grid images in folder     
+# train_digits()                    -> trains digit model from digit images in folder  
 
 ' useful attributes                 '
 # convert.saving                    -> whether saving is allowed for current converter object
