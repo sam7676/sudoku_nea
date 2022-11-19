@@ -16,7 +16,13 @@ def train_grid():
 
     #Resize all images. Returns whether image has been modified or not and image object
     for image in image_list:
-        new = resize_images(image,img_size)
+        new=False
+        if image[len(root)-1]=='0':
+            new = resize_images(image,img_size)
+        elif image[len(root)-1]=='1':
+            new = resize_stretch(image,img_size)
+        else:
+            print("Error")
         if new[1]==True:
             new[0].save(image)
             
