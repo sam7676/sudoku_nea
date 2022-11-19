@@ -123,7 +123,7 @@ def expand(inp):
 ' list of subroutines:  '
 
 ' converter.py:                     '
-# convert.init(inp,debug=False)     -> uses object detection network, returns grid string                           -> Time: True
+# convert.init(inp)                 -> uses object detection network, returns grid string                           -> Time: True
 # convert.train(solution)           -> saves digits to digit folder and grid to grid folder if saving allowed       -> Time: False
 
 ' database.py:                      '
