@@ -2,7 +2,7 @@ from imports import *
 from training import *
 
 class convert:
-    def __init__(x,inp,debug=False):
+    def __init__(x,inp):
         
         #Given input image, attempts to find grid inside
         x.digit_array = []
@@ -26,7 +26,7 @@ class convert:
         for i, img in enumerate(imgs):
             img2 = tf.keras.preprocessing.image.img_to_array(img)/255.0
             image = tf.convert_to_tensor([img2])
-            predict = grid_model.predict(image,verbose=0)[0][0]
+            predict = grid_model.predict(image,verbose=2)[0][0]
             img_preds.append(predict)
 
             if predict>pval:
@@ -35,15 +35,8 @@ class convert:
                 temp_image_store.pop(0)
             temp_image_store.append(predict)
 
-            if debug==True:
-                print(i,predict)
-
             if (statistics.mean(temp_image_store)<meanpval and max(temp_image_store)<pval) and global_max==True:
                 break
-
-        if debug==True:
-            plt.plot([i for i in range(len(img_preds))],img_preds)
-            plt.show()
 
         x.max_predict = max(img_preds)
         
@@ -52,7 +45,7 @@ class convert:
         if x.max_predict<pval:
             x.saving=False
         
-        print(f'Grid prediction confidence: {round(x.max_predict/0.01,1)}%')
+        
         max_img = imgs[img_preds.index(x.max_predict)]
         x.img = max_img
         results = ''
@@ -74,7 +67,7 @@ class convert:
                 image = image / 255.0
                 image = tf.convert_to_tensor([image])
 
-                predict = digit_model.predict(image,verbose=0).tolist()[0]
+                predict = digit_model.predict(image,verbose=2).tolist()[0]
 
                 #Get the maximum probability digit
                 maxProb,maxI = 0,0
@@ -91,6 +84,7 @@ class convert:
 
                 results+=str(predict)
         x.ans = results
+        print(f'Grid prediction confidence: {round(x.max_predict/0.01,1)}%')
         print(f"Conversion: {round(perf_counter()-start_time,3)}s")
     def search(x,input_image):
         
@@ -132,7 +126,7 @@ class convert:
             #Get image object, return list of all potential images sorted by size
             img = t[0]
             img = img.crop((x1,y1,x2,y2))
-            img = resize_images(img,img_size)[0]
+            img = resize_stretch(img,img_size)[0]
             objs.append(img)
         return objs
     def train(x,solution):
