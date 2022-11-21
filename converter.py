@@ -35,7 +35,7 @@ class convert:
                 temp_image_store.pop(0)
             temp_image_store.append(predict)
 
-            if (statistics.mean(temp_image_store)<meanpval and max(temp_image_store)<pval) and global_max==True:
+            if ((statistics.mean(temp_image_store)<meanpval and max(temp_image_store)<pval) and global_max==True) or predict==1.0:
                 break
 
         x.max_predict = max(img_preds)
