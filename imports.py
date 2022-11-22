@@ -24,7 +24,6 @@ pval = 0.999                    #minimal probability for a grid prediction to be
 meanpval =0.5                   #mean of 5 items, if lower then terminate grid selection
 img_set = 5                     #size of stack for taking the mean of
 epoch_rate = 15                 #number of iterations of neural network training
-generate_attempts = 100         #number of attempts generator should take to reduce solution
 gen_difficulty = [[0,1],[30,1],[100,2],[250,3]]
 grid_model_location =   'models\\grid_model.h5'
 digit_model_location =  'models\\digit_model.h5'
