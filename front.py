@@ -730,12 +730,23 @@ class front_end:
         #Checking name is valid
         if len(name)<=16 and len(name)>=0:
             
-            #Setting user information and adding to database
-            time = round(x.final_time,2)
-            grid = x.final_grid
-            curDate = date.today()
-            add_result(name,grid,curDate,time)
-            x.win_window.destroy()
+            #checking the input doesn't only consist of spaces
+            non_space = False 
+            for i in name:
+                if i!=' ':
+                    non_space=True 
+            if non_space:
+
+                #Setting user information and adding to database
+                time = round(x.final_time,2)
+                grid = x.final_grid
+                curDate = date.today()
+                add_result(name,grid,curDate,time)
+                x.win_window.destroy()
+
+            else:
+                #Disallowing input
+                x.submit_button["fg"]='#FF0000'      
         else:
             
             #Disallowing input
