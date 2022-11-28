@@ -813,14 +813,26 @@ class front_end:
         
         #Checking input has 1 solution -> play game or return error
         try:
+
+            #if clipboard is tring
             if len(clip)>0:
-                stri = flatten(clip)
-                k = algorithm_x(stri)
-                if k.sols==1:
-                    x.s_game(stri)
+
+                #if clipboard is URL
+                if 'http' in clip:
+                    img = Image.open(BytesIO(requests.get(clip).content))
+                    x.s_upload_stage_2(img,'C')
+            
                 else:
-                    x.clipboardB["fg"] = '#FF0000'
+
+                    #if clipboard is grid string
+                    stri = flatten(clip)
+                    k = algorithm_x(stri)
+                    if k.sols==1:
+                        x.s_game(stri)
+                    else:
+                        x.clipboardB["fg"] = '#FF0000'
             else:
+                #if clipboard is image
                 x.s_upload_stage_2(clip,'C')
         except:
             x.clipboardB["fg"] = '#FF0000'

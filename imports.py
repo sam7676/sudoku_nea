@@ -16,6 +16,8 @@ from tkinter.filedialog import askopenfilename
 import sqlite3
 from datetime import date
 from tkinter import font
+import requests
+from io import BytesIO
 
 img_size = 500                  #size of potential grids
 digit_size = img_size//10       #size of potential digits
