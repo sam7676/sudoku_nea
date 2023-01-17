@@ -7,8 +7,7 @@ def create_grid(nums,complex=True):
     grid=[]
 
     #Removes spaces, returns if invalid
-    if ' ' in nums:
-        nums=nums.replace(' ','')
+    nums=nums.replace(' ','')
     if len(nums)!=81: 
         return
 
@@ -16,7 +15,7 @@ def create_grid(nums,complex=True):
 
     #If invalid input break return nothing, otherwise return 2D / 3D grid
     for i in range(len(nums)):
-        if nums[i] not in '0123456789':
+        if nums[i] not in {'0','1','2','3','4','5','6','7','8','9'}:
             return
         elif complex:
             if nums[i] == '0':
@@ -103,9 +102,7 @@ def store_list(listK):
         temp.append(temp2[:])
     return temp
 def store_grid(grid):
-
     #Makes and returns a new copy of the grid without modifying the original
-
     temp = [][:]
     for i in range(len(grid)):
         temp2 = [][:]
@@ -116,17 +113,16 @@ def store_grid(grid):
                 temp2.append(grid[i][j])
         temp.append(temp2[:])
     return temp
-def row_column_box(grid,y1,x1): 
-        #Returns the items and co-ordinates of the cell's row, column and box
-        return [
-            [[grid[y1][0],y1,0],[grid[y1][1],y1,1],[grid[y1][2],y1,2],[grid[y1][3],y1,3],[grid[y1][4],y1,4],[grid[y1][5],y1,5],[grid[y1][6],y1,6],[grid[y1][7],y1,7],[grid[y1][8],y1,8]],
-            [[grid[0][x1],0,x1],[grid[1][x1],1,x1],[grid[2][x1],2,x1],[grid[3][x1],3,x1],[grid[4][x1],4,x1],[grid[5][x1],5,x1],[grid[6][x1],6,x1],[grid[7][x1],7,x1],[grid[8][x1],8,x1]],
-            [[grid[y1-(y1%3)][x1-(x1%3)],y1-(y1%3),x1-(x1%3)],[grid[y1-(y1%3)][x1-(x1%3)+1],y1-(y1%3),x1-(x1%3)+1],
+def get_row(grid,y1,x1):
+    return [[grid[y1][0],y1,0],[grid[y1][1],y1,1],[grid[y1][2],y1,2],[grid[y1][3],y1,3],[grid[y1][4],y1,4],[grid[y1][5],y1,5],[grid[y1][6],y1,6],[grid[y1][7],y1,7],[grid[y1][8],y1,8]]
+def get_col(grid,y1,x1):
+    return [[grid[0][x1],0,x1],[grid[1][x1],1,x1],[grid[2][x1],2,x1],[grid[3][x1],3,x1],[grid[4][x1],4,x1],[grid[5][x1],5,x1],[grid[6][x1],6,x1],[grid[7][x1],7,x1],[grid[8][x1],8,x1]]
+def get_box(grid,y1,x1):
+    return [[grid[y1-(y1%3)][x1-(x1%3)],y1-(y1%3),x1-(x1%3)],[grid[y1-(y1%3)][x1-(x1%3)+1],y1-(y1%3),x1-(x1%3)+1],
             [grid[y1-(y1%3)][x1-(x1%3)+2],y1-(y1%3),x1-(x1%3)+2],[grid[y1-(y1%3)+1][x1-(x1%3)],y1-(y1%3)+1,x1-(x1%3)],
             [grid[y1-(y1%3)+1][x1-(x1%3)+1],y1-(y1%3)+1,x1-(x1%3)+1],[grid[y1-(y1%3)+1][x1-(x1%3)+2],y1-(y1%3)+1,x1-(x1%3)+2],
             [grid[y1-(y1%3)+2][x1-(x1%3)],y1-(y1%3)+2,x1-(x1%3)],[grid[y1-(y1%3)+2][x1-(x1%3)+1],y1-(y1%3)+2,x1-(x1%3)+1],
             [grid[y1-(y1%3)+2][x1-(x1%3)+2],y1-(y1%3)+2,x1-(x1%3)+2]]
-        ]
 
 class constraint:
     def __init__(x,nums):
@@ -154,7 +150,6 @@ class constraint:
                 grid = x.partner(grid)
         return grid
     def start(x,grid,layer=0):
-        
         #Solves sudoku. If regular solution not possible, uses bowman to guess note and re-runs
         grid = x.start_reg(grid)
 
@@ -172,7 +167,7 @@ class constraint:
                 ans = x.start(g,layer+1) 
                 if ans!=None:
                     return ans   
-    def apply_rcb_changes(x,grid,LX):
+    def apply_changes(x,grid,LX):
         # Appends all changes of a row, column and box to the general grid
         for i in range(len(LX)):
             grid[LX[i][1]][LX[i][2]] = LX[i][0]
@@ -192,11 +187,22 @@ class constraint:
                 if grid[i][j] == []:
                     return False
         return True
+    def apply_to_cells(x,grid,func):
+        #Get all co-ordinates that mention every row, column and box
+        cords = [[0,0],[3,1],[6,2],[1,3],[4,4],[7,5],[2,6],[5,7],[8,8]]
+        
+        for cord in cords:
+            y1,x1=cord[0],cord[1]
+            row = get_row(grid,y1,x1)
+            grid = func(grid,row)
+            col = get_col(grid,y1,x1)
+            grid = func(grid,col)
+            box = get_box(grid,y1,x1)
+            grid = func(grid,box)
+        return grid 
     def remove_notes(x,grid):
-
         #Removes notes where applicable from a given list
-        def removeNote(listA):
-
+        def removeNote(grid,listA):
             list_store=store_list(listA)
 
             # For each item in cell R/C/B, if item length is 1,
@@ -208,28 +214,19 @@ class constraint:
                             listA[j][0].remove(listA[i][0][0])
             
             # If changes have been made, add it to the list of moves and modify grid
+
+            #grid accessed both times, only passed through master function, weird.
+
+
             if listA!=list_store:
                 x.find_change(list_store,listA,4)
-                return x.apply_rcb_changes(grid,listA)
+                return x.apply_changes(grid,listA)
             return grid
         
-        #Gets all possible rows, columns and boxes and runs the removeNote function
-        cords = [[0,0],[3,1],[6,2],[1,3],[4,4],[7,5],[2,6],[5,7],[8,8]]
-        
-        for cord in cords:
-            y1,x1=cord[0],cord[1]
-
-            row = row_column_box(grid,y1,x1)[0]
-            grid = removeNote(row)
-            col = row_column_box(grid,y1,x1)[1]
-            grid = removeNote(col)
-            box = row_column_box(grid,y1,x1)[2]
-            grid = removeNote(box) 
-        return grid
+        return x.apply_to_cells(grid,removeNote)
     def one_note_instance(x,grid):
-
         #Finds instances where a number fits into only one cell in a lsit
-        def noteInstance(listA):
+        def noteInstance(grid,listA):
             list_store=store_list(listA)
 
             #If a number can fit into only one cell in a list, remove other notes from that cell
@@ -246,25 +243,14 @@ class constraint:
             #If any changes have occurred, modify grid and add to move list
             if listA!=list_store:
                 x.find_change(list_store,listA,1)
-                return x.apply_rcb_changes(grid,listA)
+                return x.apply_changes(grid,listA)
             return grid
 
-        #Gets all possible rows, columns and boxes and runs the noteInstance function
-        cords = [[0,0],[3,1],[6,2],[1,3],[4,4],[7,5],[2,6],[5,7],[8,8]] 
-        for cord in cords:
-            y1,x1=cord[0],cord[1]
-
-            row = row_column_box(grid,y1,x1)[0]
-            grid = noteInstance(row)
-            col = row_column_box(grid,y1,x1)[1]
-            grid = noteInstance(col)
-            box = row_column_box(grid,y1,x1)[2]
-            grid = noteInstance(box) 
-            
-        return grid
+        return x.apply_to_cells(grid,noteInstance)
     def partner(x,grid):
+
         def convert_RCB_to_note(LX): 
-            #converts list directly into notes inside the cell given one entry in RCB
+            #converts list directly into notes inside the cell given one entry in row-col-box
             def conv_RCB_term(LX): 
                 temp = list(str(LX))[0:len(str(LX))-7]
                 for i in range(len(temp)-1,-1,-1):
@@ -344,20 +330,12 @@ class constraint:
             #applies list changes globally
             if LX != list_store:
                 x.find_change(list_store,LX,2)
-                grid = x.apply_rcb_changes(grid,LX)
+                grid = x.apply_changes(grid,LX)
             return grid
 
-        #Gets all possible rows, columns and boxes and runs the partnerFunc function
-        temp = [[0,0],[3,1],[6,2],[1,3],[4,4],[7,5],[2,6],[5,7],[8,8]]
-        for i in range(len(temp)):
-            row = row_column_box(grid,temp[i][0],temp[i][1])[0]
-            grid = partnerFunc(grid,row)
-            col = row_column_box(grid,temp[i][0],temp[i][1])[1]
-            grid = partnerFunc(grid,col)
-            box = row_column_box(grid,temp[i][0],temp[i][1])[2]
-            grid = partnerFunc(grid,box)
-        
-        return grid
+
+        #Get all co-ordinates that mention every row, column and box.
+        return x.apply_to_cells(grid,partnerFunc)
     def next_move(x,nums):
         
         #For any bowman values, only include moves where guessed note = True answer
@@ -487,11 +465,11 @@ class generate(algorithm_x):
         hardest_generate = []
         for i in range(attempts[1]):
             ans = x.remove_complete(store_grid(final_grid),attempts[0],grid_inp)
-            hardest_generate.append([ans,constraint(export_answer(ans)).time])
+            hardest_generate.append(ans)
         hardest_generate.sort(key=lambda x: x[1])
         
         print(f"Generator: {round(perf_counter()-start_time,6)}s")
-        x.ans = export_answer(hardest_generate[-1][0]) 
+        x.ans = export_answer(hardest_generate[0][0]) 
     def generate_complete(x,grid_inp):
 
         #Create grid
@@ -549,6 +527,4 @@ class generate(algorithm_x):
                             changes+=1
 
         print(f'Generation changes: {changes}')
-        return grid
-
-
+        return [grid,changes]
