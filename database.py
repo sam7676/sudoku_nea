@@ -1,7 +1,6 @@
 from imports import *
 
 
-
 def add_result(name,grid,date,time):
     con = sqlite3.connect(database_location)
     cur = con.cursor()
