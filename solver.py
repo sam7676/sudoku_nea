@@ -89,40 +89,42 @@ def export_answer(grid):
 def store_list(listK):
 
     #Makes and returns a new copy of a list without modifying the original
+    #Attempted to skip this by using copy module's deepcopy, however that was not optimised and the function took longer
+    #so ignored
 
-    temp = [][:]
+    temp = []
     for i in range(len(listK)):
-        temp2 = [][:]
-        temp3 = [][:]
-        for j in range(len(listK[i][0])):
-            temp3.append(listK[i][0][j])
-        temp2.append(temp3[:])
-        temp2.append(listK[i][1])
-        temp2.append(listK[i][2])
-        temp.append(temp2[:])
+        temp2 = [listK[i][0][:],listK[i][1],listK[i][2]]
+        temp.append(temp2)
     return temp
 def store_grid(grid):
     #Makes and returns a new copy of the grid without modifying the original
-    temp = [][:]
-    for i in range(len(grid)):
-        temp2 = [][:]
-        for j in range(len(grid[i])):
-            if type(grid[i][j])==list:
+    temp=[]
+    if type(grid[0][0])==list:
+        for i in range(len(grid)):
+            temp2 = []
+            for j in range(len(grid[i])):
                 temp2.append(grid[i][j][:])
-            else:
+            temp.append(temp2[:])
+    else:
+        for i in range(len(grid)):
+            temp2 = []
+            for j in range(len(grid[i])):
                 temp2.append(grid[i][j])
-        temp.append(temp2[:])
+            temp.append(temp2[:])
     return temp
-def get_row(grid,y1,x1):
+def get_row(grid,y1):
     return [[grid[y1][0],y1,0],[grid[y1][1],y1,1],[grid[y1][2],y1,2],[grid[y1][3],y1,3],[grid[y1][4],y1,4],[grid[y1][5],y1,5],[grid[y1][6],y1,6],[grid[y1][7],y1,7],[grid[y1][8],y1,8]]
-def get_col(grid,y1,x1):
+def get_col(grid,x1):
     return [[grid[0][x1],0,x1],[grid[1][x1],1,x1],[grid[2][x1],2,x1],[grid[3][x1],3,x1],[grid[4][x1],4,x1],[grid[5][x1],5,x1],[grid[6][x1],6,x1],[grid[7][x1],7,x1],[grid[8][x1],8,x1]]
 def get_box(grid,y1,x1):
-    return [[grid[y1-(y1%3)][x1-(x1%3)],y1-(y1%3),x1-(x1%3)],[grid[y1-(y1%3)][x1-(x1%3)+1],y1-(y1%3),x1-(x1%3)+1],
-            [grid[y1-(y1%3)][x1-(x1%3)+2],y1-(y1%3),x1-(x1%3)+2],[grid[y1-(y1%3)+1][x1-(x1%3)],y1-(y1%3)+1,x1-(x1%3)],
-            [grid[y1-(y1%3)+1][x1-(x1%3)+1],y1-(y1%3)+1,x1-(x1%3)+1],[grid[y1-(y1%3)+1][x1-(x1%3)+2],y1-(y1%3)+1,x1-(x1%3)+2],
-            [grid[y1-(y1%3)+2][x1-(x1%3)],y1-(y1%3)+2,x1-(x1%3)],[grid[y1-(y1%3)+2][x1-(x1%3)+1],y1-(y1%3)+2,x1-(x1%3)+1],
-            [grid[y1-(y1%3)+2][x1-(x1%3)+2],y1-(y1%3)+2,x1-(x1%3)+2]]
+    modY = y1%3
+    modX = x1%3
+    return [[grid[y1-(modY)][x1-(modX)],y1-(modY),x1-(modX)],[grid[y1-(modY)][x1-(modX)+1],y1-(modY),x1-(modX)+1],
+            [grid[y1-(modY)][x1-(modX)+2],y1-(modY),x1-(modX)+2],[grid[y1-(modY)+1][x1-(modX)],y1-(modY)+1,x1-(modX)],
+            [grid[y1-(modY)+1][x1-(modX)+1],y1-(modY)+1,x1-(modX)+1],[grid[y1-(modY)+1][x1-(modX)+2],y1-(modY)+1,x1-(modX)+2],
+            [grid[y1-(modY)+2][x1-(modX)],y1-(modY)+2,x1-(modX)],[grid[y1-(modY)+2][x1-(modX)+1],y1-(modY)+2,x1-(modX)+1],
+            [grid[y1-(modY)+2][x1-(modX)+2],y1-(modY)+2,x1-(modX)+2]]
 
 class constraint:
     def __init__(x,nums):
@@ -193,9 +195,9 @@ class constraint:
         
         for cord in cords:
             y1,x1=cord[0],cord[1]
-            row = get_row(grid,y1,x1)
+            row = get_row(grid,y1)
             grid = func(grid,row)
-            col = get_col(grid,y1,x1)
+            col = get_col(grid,x1)
             grid = func(grid,col)
             box = get_box(grid,y1,x1)
             grid = func(grid,box)
@@ -214,13 +216,10 @@ class constraint:
                             listA[j][0].remove(listA[i][0][0])
             
             # If changes have been made, add it to the list of moves and modify grid
-
-            #grid accessed both times, only passed through master function, weird.
-
-
             if listA!=list_store:
                 x.find_change(list_store,listA,4)
                 return x.apply_changes(grid,listA)
+            # If not return grid
             return grid
         
         return x.apply_to_cells(grid,removeNote)
@@ -249,21 +248,12 @@ class constraint:
         return x.apply_to_cells(grid,noteInstance)
     def partner(x,grid):
 
-        def convert_RCB_to_note(LX): 
-            #converts list directly into notes inside the cell given one entry in row-col-box
-            def conv_RCB_term(LX): 
-                temp = list(str(LX))[0:len(str(LX))-7]
-                for i in range(len(temp)-1,-1,-1):
-                    if temp[i] not in '123456789':
-                        temp.pop(i)
-                for i in range(len(temp)):
-                    temp[i] = int(temp[i])
-                return temp
-
-            result=[]
-            for i in range(len(LX)):
-                result.append(conv_RCB_term(LX[i]))
-            return result
+        #used to remove the co-ordinates given as part of a row, column, box function
+        def convert_RCB_to_note(LX):
+            L = LX[:]
+            for i in range(len(L)):
+                L[i] = L[i][0]
+            return L
 
         #finds all "partner" cells in a list
         def partnerFunc(grid,LX):
@@ -288,27 +278,27 @@ class constraint:
                                 if i in nums[j] and j not in used:
 
                                     #store the potential and used list
-                                    t1,t2 = potential[:],used[:]
+                                    potential_store,used_store = potential[:],used[:]
 
                                     #any new numbers that the cell matches the potential number and haven't been used
                                     for k in nums[j]:
-                                        if k not in t1:
-                                            t1.append(k)
+                                        if k not in potential_store:
+                                            potential_store.append(k)
 
                                     #add the list position to used indexes
-                                    t2.append(j)
+                                    used_store.append(j)
 
                                     #if new potential has same length as used list (closed loop, no more to explore)
-                                    if len(t1)==len(t2):
-                                        temp = len(t1)
+                                    if len(potential_store)==len(used_store):
+                                        len_pot_store = len(potential_store)
 
                                         #if the length of potential is less than the minimum, assign minimals
-                                        if temp < mini: 
-                                            mini,miniPot,miniInd = temp, t1, t2
+                                        if len_pot_store < mini: 
+                                            mini,miniPot,miniInd = len_pot_store, potential_store, used_store
                                     else:
 
                                         #keep exploring potential until it cuts off at 0 
-                                        return run(t1,t2,mini,miniPot,miniInd)
+                                        return run(potential_store,used_store,mini,miniPot,miniInd)
                     
                     #returns the smallest findable groups and their indexes
                     return [miniPot,miniInd]
@@ -332,7 +322,6 @@ class constraint:
                 x.find_change(list_store,LX,2)
                 grid = x.apply_changes(grid,LX)
             return grid
-
 
         #Get all co-ordinates that mention every row, column and box.
         return x.apply_to_cells(grid,partnerFunc)
@@ -456,7 +445,7 @@ class algorithm_x:
                         X[k].add(i)
 
 class generate(algorithm_x):
-    def __init__(x,attempts,grid_inp='000000000000000000000000000000000000000000000000000000000000000000000000000000000'):
+    def __init__(x,attempts=[0,1],grid_inp='000000000000000000000000000000000000000000000000000000000000000000000000000000000'):
         
         start_time = perf_counter()
         grid_inp = flatten(grid_inp)
@@ -528,3 +517,4 @@ class generate(algorithm_x):
 
         print(f'Generation changes: {changes}')
         return [grid,changes]
+
