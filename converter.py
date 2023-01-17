@@ -5,14 +5,14 @@ class convert:
     def __init__(x,inp):
         
         #Given input image, attempts to find grid inside
-        x.digit_array = []
+        x.digit_array = [] #stores array of predicted digits, for saving issues
         start_time = perf_counter()
         imgs = x.search(inp)
 
         #Loading models and processing potential grid images
         grid_model = tf.keras.models.load_model(grid_model_location)
         digit_model = tf.keras.models.load_model(digit_model_location)
-        img_preds=[]
+        img_predictions=[]
         temp_image_store=[]
         global_max=False
 
@@ -24,10 +24,10 @@ class convert:
         # the highest-scoring grid
 
         for i, img in enumerate(imgs):
-            img2 = tf.keras.preprocessing.image.img_to_array(img)/255.0
-            image = tf.convert_to_tensor([img2])
-            predict = grid_model.predict(image,verbose=2)[0][0]
-            img_preds.append(predict)
+
+            #convert image to tensor then run prediction
+            predict = grid_model.predict(tf.convert_to_tensor([tf.keras.preprocessing.image.img_to_array(img)/255.0]),verbose=2)[0][0]
+            img_predictions.append(predict)
 
             if predict>pval:
                 global_max=True
@@ -38,7 +38,7 @@ class convert:
             if ((statistics.mean(temp_image_store)<meanpval and max(temp_image_store)<pval) and global_max==True) or predict==1.0:
                 break
 
-        x.max_predict = max(img_preds)
+        x.max_predict = max(img_predictions)
         
         #Allow saving of the grid if the minimum prediction confidence has been achieved
         x.saving=True
@@ -46,8 +46,7 @@ class convert:
             x.saving=False
         
         
-        max_img = imgs[img_preds.index(x.max_predict)]
-        x.img = max_img
+        x.img = imgs[img_predictions.index(x.max_predict)]
         results = ''
 
         #Split the grid into 81 squares of equal area. These are expected to be the cells.
@@ -58,16 +57,13 @@ class convert:
             for i in range(9):
 
                 #Crop max image, resize it, process it
-                img = max_img.copy()
+                img = x.img.copy()
                 img = img.crop(((i*indent)//1,(j*indent)//1,((i+1)*indent)//1,((j+1)*indent)//1))
                 img = img.resize((digit_size,digit_size))
                 img = img.convert('RGB')
                 
-                image = tf.keras.preprocessing.image.img_to_array(img)
-                image = image / 255.0
-                image = tf.convert_to_tensor([image])
-
-                predict = digit_model.predict(image,verbose=2).tolist()[0]
+                #Convert to tensor and predict
+                predict = digit_model.predict(tf.convert_to_tensor([tf.keras.preprocessing.image.img_to_array(img)/255.0]),verbose=2).tolist()[0]
 
                 #Get the maximum probability digit
                 maxProb,maxI = 0,0
@@ -113,11 +109,11 @@ class convert:
             #Get co-ordinates
             x1,y1,x2,y2 = rects[i][0],rects[i][1],rects[i][2],rects[i][3]
 
-            #If width = 0 or height = 0, break
+            #If width < 50 or height < 50, break
             #If width is not similar to height, cannot be square, break
             #If area is not large enough, break
 
-            if (x2==0 or y2==0) or (x2//(img_size//50) != y2//(img_size//50)) or (x2*y2 < ((img_size)**2//100)):
+            if (x2<75 or y2<75) or (x2//(img_size//50) != y2//(img_size//50)) or (x2*y2 < ((img_size)**2//100)):
                 continue
 
             x2 += x1
@@ -136,9 +132,11 @@ class convert:
         accuracy=0
         solution = flatten(solution)
 
+        #Saving grid
         if x.saving==True:
             x.img.save(f'{grid_location}\\1\\{x.max_predict}{get_name()}.png')
 
+        #Saving digits
         for img_arr in x.digit_array:
             if x.saving==True:
                 img_arr[0].save(f'{digit_location}\\{solution[9*img_arr[2]+img_arr[1]]}\\{get_name()}.png')
