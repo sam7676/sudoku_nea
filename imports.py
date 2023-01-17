@@ -20,7 +20,7 @@ import requests
 from io import BytesIO
 
 img_size = 500                  #size of potential grids
-digit_size = img_size//10       #size of potential digits
+digit_size = 50      #size of potential digits
 split_rate = 0.8                #splitting training and test data of NN
 pval = 0.999                    #minimal probability for a grid prediction to be accurate
 meanpval =0.5                   #mean of 5 items, if lower then terminate grid selection
@@ -85,6 +85,7 @@ def resize_images(image,img_size):
         return [img,False]
 
 def resize_stretch(image,img_size):
+    #resizes via stretch method and returns whether it has been stretched or not
     if type(image)==str:
         if '.png' in image or '.jpg' in image or '.jpeg' in image or '.gif' in image:
             img = Image.open(image)
@@ -146,10 +147,10 @@ def expand(inp):
 # create_grid(nums,complex)         -> returns grid object (2D if complex=False, 3D if complex=True)       
 # print_grid(grid)                  -> prints grid from either either 3D object or string                
 # export_answer(grid)               -> converts grid object to string export (2D or 3D)                        
-# store_grid(grid)                  -> returns duplicate grid object that                                        
+# store_grid(grid)                  -> returns duplicate grid object                                        
 # constraint.init(nums)             -> uses constraint solver and returns string answer         
 # constraint.next_move(nums)        -> given grid input, returns appended grid and hint array    
-# algorithm_x.init(nums)            -> initiates algorithm x solver
+# algorithm_x.init(nums)            -> initiates algorithm x solution checker
 # generate.init()                   -> returns valid grid in string form  
 
 ' training.py                       '
