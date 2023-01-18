@@ -20,7 +20,7 @@ import requests
 from io import BytesIO
 
 img_size = 500                  #size of potential grids
-digit_size = 50      #size of potential digits
+digit_size = 50                 #size of potential digits
 split_rate = 0.8                #splitting training and test data of NN
 pval = 0.999                    #minimal probability for a grid prediction to be accurate
 meanpval =0.5                   #mean of 5 items, if lower then terminate grid selection
