@@ -6,13 +6,11 @@ from database import *
 
 class front_end:
     def __init__(x):
-
         #Create window
         x.win=tk.Tk()
         x.win.resizable(False, False)
         x.s_home()
     def s_home(x):
-
         #Create window
         x.win.destroy()
         x.win = tk.Tk()
@@ -53,7 +51,6 @@ class front_end:
         exitB.grid(row=3)
         x.win.mainloop()
     def s_play_options(x): 
-
         #Create window, set style
         x.win.destroy()
         x.win = tk.Tk()
@@ -87,7 +84,6 @@ class front_end:
         backB.grid(row=4)
         x.win.mainloop()
     def s_create_custom_game(x):
-
         #Create window and set style
         x.win.destroy()
         x.win = tk.Tk()
@@ -130,7 +126,6 @@ class front_end:
         frame2.grid(row=2,column=0)
         x.win.mainloop()
     def s_upload_stage_1(x):
-
         #Create window and style
         x.win.destroy()
         x.win = tk.Tk()
@@ -162,7 +157,6 @@ class front_end:
         x.win.mainloop()
     def s_upload_stage_2(x,image,button_type):
         try:
-
             #Converting image
             image_conversion = convert(image)
         
@@ -221,7 +215,6 @@ class front_end:
             elif button_type=='O':
                 x.openFileB["fg"]='#FF0000'
     def s_game(x,grid):
-        
         #Setting up constraint solver for next move function
         x.game_solution = constraint(grid)
         x.grid_input = grid
@@ -318,7 +311,6 @@ class front_end:
         x.timer_start = perf_counter()
         x.win.mainloop()
     def s_leaderboard(x):
-
         #Create window and set style
         x.win.destroy()
         x.win = tk.Tk()
@@ -359,7 +351,6 @@ class front_end:
         x.query_frame = tk.Frame()
         x.win.mainloop()
     def s_generate(x):
-
         #Create window and style
         x.win.destroy()
         x.win = tk.Tk()
@@ -391,7 +382,6 @@ class front_end:
         backB.grid(row=3)
         x.win.mainloop()
     def s_win(x):
-
         #Create window
         x.final_time = perf_counter() - x.timer_start
         x.final_grid = x.grid_input
@@ -437,7 +427,6 @@ class front_end:
         quit_button.grid(row=7)
         x.win_window.mainloop()
     def s_debug(x):
-
         #Create window and style
         x.win.destroy()
         x.win = tk.Tk()
@@ -476,7 +465,7 @@ class front_end:
             #Checking that length = 1 in all cases and only 123456789 appear
             errors=False
             for i in range(len(grid)):
-                if len(grid[i])>1 or grid[i][0] not in '123456789':
+                if len(grid[i])>1 or grid[i][0] not in {'1','2','3','4','5','6','7','8','9'}:
                     x.entries[i]['fg'] = '#ff0000'
                     errors=True
                 else:
@@ -520,8 +509,7 @@ class front_end:
 
             #Error
             x.confirmB["fg"] = '#FF0000'            
-    def f_upload_open_file(x):
-        
+    def f_upload_open_file(x): 
         #Get file name then upload screen
         try:
             file = askopenfilename()
@@ -529,7 +517,6 @@ class front_end:
         except:
             x.openFileB["fg"]='#FF0000'
     def f_get_hint(x,hint=True):
-        
         #Getting grid from entries (and sorting at the same time)
         f_label = font.Font(family="TkDefaultFont",size=17,weight="normal")
         grid=[]
@@ -631,7 +618,9 @@ class front_end:
             for i in range(len(grid4)):
                 for j in range(len(grid4)):
                     if len(grid4[i][j])==1:
-                        row, col, box = row_column_box(grid4,i,j)
+                        row = get_row(grid4,i)
+                        col = get_col(grid4,j)
+                        box = get_box(grid4,i,j)
                         keepItem = True
                         for a in range(len(row)):
                             if grid4[i][j][0] in row[a][0] and [i,j]!=[row[a][1],row[a][2]]:
@@ -695,7 +684,6 @@ class front_end:
                 x.hints+=1
                 x.hints_used_label["text"] = f"Hints used: {x.hints}"                     
     def f_solve_game(x):
-
         #Style
         f_label = font.Font(family="TkDefaultFont",size=17,weight="normal")
         
@@ -723,7 +711,6 @@ class front_end:
         x.hintB.configure(command=x.f_do_nothing)
         x.solveB.configure(command=x.f_do_nothing)
     def f_submit_score(x):
-
         #Getting name
         name = x.score_entry.get()
 
@@ -752,7 +739,6 @@ class front_end:
             #Disallowing input
             x.submit_button["fg"]='#FF0000'      
     def f_return_query(x):
-
         #Setting style
         f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
         title_relief = tk.RAISED
@@ -819,7 +805,6 @@ class front_end:
         #Placing in window
         x.query_frame.grid(row=2,column=0)
     def f_check_clipboard(x):
-
         clip = clipboard.paste()
         
         #Checking input has 1 solution -> play game or return error
@@ -852,7 +837,6 @@ class front_end:
             if type(x.entries[i])==tk.Text:
                 x.entries[i].delete("1.0","end")
     def f_validate_grid(x):
-
         #Iterating through cells
         for q,entry in enumerate(x.entries):
 
@@ -863,7 +847,7 @@ class front_end:
                 #Forcing text to be only digits
                 text = list(text)
                 for i in range(len(text)-1,-1,-1):
-                    if text[i] not in ['1','2','3','4','5','6','7','8','9']:
+                    if text[i] not in {'1','2','3','4','5','6','7','8','9'}:
                         text.pop(i)
                     else:
                         text[i] = int(text[i])
@@ -888,6 +872,5 @@ class front_end:
                 else:
                     x.entries[q]['fg']='#000000'
     def f_do_nothing(x):
-
         #This function does nothing.
         pass
