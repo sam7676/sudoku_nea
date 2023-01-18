@@ -465,7 +465,7 @@ class front_end:
             #Checking that length = 1 in all cases and only 123456789 appear
             errors=False
             for i in range(len(grid)):
-                if len(grid[i])>1 or grid[i][0] not in {'1','2','3','4','5','6','7','8','9'}:
+                if len(grid[i])>1 or grid[i][0] not in '123456789':
                     x.entries[i]['fg'] = '#ff0000'
                     errors=True
                 else:
