@@ -446,11 +446,9 @@ class algorithm_x:
 
 class generate(algorithm_x):
     def __init__(x,attempts=[0,1],grid_inp='000000000000000000000000000000000000000000000000000000000000000000000000000000000'):
-        
         start_time = perf_counter()
         grid_inp = flatten(grid_inp)
         final_grid = x.generate_complete(grid_inp)
-
         hardest_generate = []
         for i in range(attempts[1]):
             ans = x.remove_complete(store_grid(final_grid),attempts[0],grid_inp)
@@ -505,7 +503,7 @@ class generate(algorithm_x):
         if attempts >= 200:
             for i in range(len(grid)):
                 for j in range(len(grid[i])):
-                    if grid[i][j]!=0:
+                    if grid[i][j]!=0 and original[9*i+j]=='0':
                         k= grid[i][j]
                         grid[i][j]=0
                         x.solving(grid)
@@ -515,6 +513,5 @@ class generate(algorithm_x):
                         else:
                             changes+=1
 
-        print(f'Generation changes: {changes}')
         return [grid,changes]
 

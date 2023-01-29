@@ -825,6 +825,11 @@ class front_end:
                     k = algorithm_x(stri)
                     if k.sols==1:
                         x.s_game(stri)
+                    elif k.sols==2:
+                        y = random.randint(0,len(gen_difficulty)-1)
+                        print(f'Difficulty level: {y+1}')
+                        x.s_game(generate(gen_difficulty[y],stri).ans)
+
                     else:
                         x.clipboardB["fg"] = '#FF0000'
             else:
