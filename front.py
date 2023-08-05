@@ -27,7 +27,7 @@ class front_end:
         logoL = tk.Label(image=logo)
         
         #Name and frame
-        nameL = tk.Label(text='Sam S',
+        nameL = tk.Label(text='github.com/sam7676',
             width=w,height=1,font=f_name,fg='#5B0000')
         frame1 = tk.Frame()
 
