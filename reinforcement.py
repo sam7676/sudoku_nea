@@ -191,6 +191,7 @@ class RLTrain:
                     episode_durations.append(t + 1)
                     break
 
+        # Returns the number of iterations until completion
         return episode_durations
         
 
