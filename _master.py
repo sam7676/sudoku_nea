@@ -7,6 +7,7 @@ from solver import *
 from training import *
 from imports import *
 from database import *
+from reinforcement import *
 
 print(f"Start time: {round(perf_counter()-start_time,3)}s")
 front_end()

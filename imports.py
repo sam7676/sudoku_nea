@@ -10,6 +10,9 @@ import numpy as np
 import clipboard
 import pyautogui as pg                          # This for some reason modifies the font
 from itertools import product
+from itertools import count
+from collections import namedtuple
+from collections import deque
 import statistics
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
@@ -18,6 +21,18 @@ from datetime import date
 from tkinter import font
 import requests
 from io import BytesIO
+import math
+import gymnasium as gym
+from gymnasium import Env, spaces
+import matplotlib
+import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+
+
+
 
 img_size = 500                  #size of potential grids
 digit_size = 50                 #size of potential digits
@@ -26,6 +41,7 @@ pval = 0.999                    #minimal probability for a grid prediction to be
 meanpval =0.5                   #mean of 5 items, if lower then terminate grid selection
 img_set = 5                     #size of stack for taking the mean of
 epoch_rate = 15                 #number of iterations of neural network training
+rl_grid_size = 4
 gen_difficulty = [[0,1],[30,1],[100,2],[250,3]]
 grid_model_location =   'models\\grid_model.h5'
 digit_model_location =  'models\\digit_model.h5'
