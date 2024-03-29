@@ -10,6 +10,8 @@ class front_end:
         x.win=tk.Tk()
         x.win.resizable(False, False)
         x.s_home()
+        plt.ion()
+
     def s_home(x):
         #Create window
         x.win.destroy()
@@ -36,7 +38,7 @@ class front_end:
             master=frame1,width=w,height=h,font=f_title,relief=rel)
         leaderboardB = tk.Button(text='Leaderboard',command=x.s_leaderboard,
             master=frame1,width=w,height=h,font=f_title,relief=rel)
-        debugB = tk.Button(text='Debug',command=x.s_debug,
+        trainB = tk.Button(text='Train',command=x.s_train,
             master=frame1,width=w,height=h,font=f_title,relief=rel)
         exitB = tk.Button(text='Exit',command=x.win.destroy,
             master=frame1,width=w,height=h,font=f_title,relief=rel)
@@ -47,9 +49,10 @@ class front_end:
         frame1.grid(row=2)
         playB.grid(row=0)
         leaderboardB.grid(row=1)
-        debugB.grid(row=2)
+        trainB.grid(row=2)
         exitB.grid(row=3)
         x.win.mainloop()
+
     def s_play_options(x): 
         #Create window, set style
         x.win.destroy()
@@ -83,6 +86,7 @@ class front_end:
         uploadB.grid(row=3)
         backB.grid(row=4)
         x.win.mainloop()
+
     def s_create_custom_game(x):
         #Create window and set style
         x.win.destroy()
@@ -125,6 +129,7 @@ class front_end:
         frame1.grid(row=1,column=0)
         frame2.grid(row=2,column=0)
         x.win.mainloop()
+
     def s_upload_stage_1(x):
         #Create window and style
         x.win.destroy()
@@ -155,6 +160,7 @@ class front_end:
         x.openFileB.grid(row=2)
         backB.grid(row=4)
         x.win.mainloop()
+
     def s_upload_stage_2(x,image,button_type):
         try:
             #Converting image
@@ -214,6 +220,7 @@ class front_end:
                 x.clipboardB["fg"]='#FF0000'
             elif button_type=='O':
                 x.openFileB["fg"]='#FF0000'
+
     def s_game(x,grid):
         #Setting up constraint solver for next move function
         x.game_solution = constraint(grid)
@@ -310,6 +317,7 @@ class front_end:
         #Timer and window set-up
         x.timer_start = perf_counter()
         x.win.mainloop()
+
     def s_leaderboard(x):
         #Create window and set style
         x.win.destroy()
@@ -350,6 +358,7 @@ class front_end:
         miniFrame2.grid(row=0,column=1)
         x.query_frame = tk.Frame()
         x.win.mainloop()
+
     def s_generate(x):
         #Create window and style
         x.win.destroy()
@@ -381,6 +390,7 @@ class front_end:
         diff_frame.grid(row=1)
         backB.grid(row=3)
         x.win.mainloop()
+
     def s_win(x):
         #Create window
         x.final_time = perf_counter() - x.timer_start
@@ -426,7 +436,8 @@ class front_end:
         x.submit_button.grid(row=6)
         quit_button.grid(row=7)
         x.win_window.mainloop()
-    def s_debug(x):
+
+    def s_train(x):
         #Create window and style
         x.win.destroy()
         x.win = tk.Tk()
@@ -438,22 +449,96 @@ class front_end:
         w=30
 
         #Image
-        debug_image = ImageTk.PhotoImage(Image.open(img_debug))
-        debugL = tk.Label(image=debug_image)
+        train_image = ImageTk.PhotoImage(Image.open(img_train))
+        trainL = tk.Label(image=train_image)
 
         #Buttons
-        train_digits_b = tk.Button(text='Train digits',font=f_main,command=train_digits,width=w,height=2)
-        train_grid_b = tk.Button(text='Train grid',font=f_main,command=train_grid,width=w,height=2)
+        train_digits_b = tk.Button(text='Train digits',font=f_main,command=x.s_train_digits,width=w,height=2)
+        train_grid_b = tk.Button(text='Train grid',font=f_main,command=x.s_train_grid,width=w,height=2)
+        train_rl_b = tk.Button(text='Train RL solver',font=f_main,command=x.s_train_rl,width=w,height=2)
         clear_LB_b = tk.Button(text='Clear leaderboard',font=f_main,command=clear_table,width=w,height=2)
         backB = tk.Button(text='Back',command=x.s_home,font=f_main,width=w,height=2)
 
         #GUI
-        debugL.grid(row=0,column=0)
+        trainL.grid(row=0,column=0)
         train_digits_b.grid(row=1)
         train_grid_b.grid(row=2)
-        clear_LB_b.grid(row=3)
-        backB.grid(row=4)
+        train_rl_b.grid(row=3)
+        clear_LB_b.grid(row=4)
+        backB.grid(row=5)
         x.win.mainloop()
+
+    def s_train_digits(x):
+
+        #Create window and style
+        x.win.destroy()
+        x.win = tk.Tk()
+        x.win.title('')
+        x.win.resizable(False,False)
+        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
+        x.win.iconphoto(False, o1x1_logo)
+        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
+        w=80
+
+        x.startB = tk.Button(text='Start digit training', command=x.f_train_digits,font=f_main,width=w,height=2)
+        x.backB = tk.Button(text='Back',command=x.s_home,font=f_main,width=w,height=2)
+        x.epochsLabel = tk.Label(text="Epochs",font=f_main,width=w,height=2,relief=tk.RAISED)
+        x.epochsEntry = tk.Entry(font=f_main,width=w,justify="center")
+        x.epochsEntry.insert(0,"15")
+
+        #GUI
+        x.startB.grid(row=0)
+        x.backB.grid(row=1)
+        x.epochsLabel.grid(row=2)
+        x.epochsEntry.grid(row=3)
+        x.win.mainloop()
+
+    def s_train_grid(x):
+        #Create window and style
+        x.win.destroy()
+        x.win = tk.Tk()
+        x.win.title('')
+        x.win.resizable(False,False)
+        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
+        x.win.iconphoto(False, o1x1_logo)
+        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
+        w=80
+
+        x.startB = tk.Button(text='Start grid training', command=x.f_train_grid,font=f_main,width=w,height=2)
+        x.backB = tk.Button(text='Back',command=x.s_home,font=f_main,width=w,height=2)
+        x.epochsLabel = tk.Label(text="Epochs",font=f_main,width=w,height=2,relief=tk.RAISED)
+        x.epochsEntry = tk.Entry(font=f_main,width=w,justify="center")
+        x.epochsEntry.insert(0,"15")
+
+        #GUI
+        x.startB.grid(row=0)
+        x.backB.grid(row=1)
+        x.epochsLabel.grid(row=2)
+        x.epochsEntry.grid(row=3)
+        x.win.mainloop()
+
+    def s_train_rl(x):
+        #Create window and style
+        x.win.destroy()
+        x.win = tk.Tk()
+        x.win.title('')
+        x.win.resizable(False,False)
+        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
+        x.win.iconphoto(False, o1x1_logo)
+        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
+        w=30
+
+        
+        # want a matplotlib graph that self updates and displays in tkinter
+
+        startB = tk.Button(text='Start RL training', command=x.f_do_nothing,font=f_main,width=w,height=2)
+        backB = tk.Button(text='Back',command=x.s_home,font=f_main,width=w,height=2)
+
+        #GUI
+        startB.grid(row=0)
+        backB.grid(row=1)
+        x.win.mainloop()
+
     def f_check_valid_grid_creation(x,upload=None):
         try:
 
@@ -509,6 +594,7 @@ class front_end:
 
             #Error
             x.confirmB["fg"] = '#FF0000'            
+
     def f_upload_open_file(x): 
         #Get file name then upload screen
         try:
@@ -516,6 +602,7 @@ class front_end:
             x.s_upload_stage_2(Image.open(file),'B')
         except:
             x.openFileB["fg"]='#FF0000'
+
     def f_get_hint(x,hint=True):
         #Getting grid from entries (and sorting at the same time)
         f_label = font.Font(family="TkDefaultFont",size=17,weight="normal")
@@ -683,6 +770,7 @@ class front_end:
                 #Change hints label
                 x.hints+=1
                 x.hints_used_label["text"] = f"Hints used: {x.hints}"                     
+
     def f_solve_game(x):
         #Style
         f_label = font.Font(family="TkDefaultFont",size=17,weight="normal")
@@ -710,6 +798,7 @@ class front_end:
         x.checkB.configure(command=x.f_do_nothing)
         x.hintB.configure(command=x.f_do_nothing)
         x.solveB.configure(command=x.f_do_nothing)
+
     def f_submit_score(x):
         #Getting name
         name = x.score_entry.get()
@@ -738,6 +827,7 @@ class front_end:
             
             #Disallowing input
             x.submit_button["fg"]='#FF0000'      
+
     def f_return_query(x):
         #Setting style
         f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
@@ -804,6 +894,7 @@ class front_end:
 
         #Placing in window
         x.query_frame.grid(row=2,column=0)
+
     def f_check_clipboard(x):
         clip = clipboard.paste()
         
@@ -837,10 +928,12 @@ class front_end:
                 x.s_upload_stage_2(clip,'C')
         except:
             x.clipboardB["fg"] = '#FF0000'
+
     def f_clear_grid(x):
         for i in range(len(x.entries)):
             if type(x.entries[i])==tk.Text:
                 x.entries[i].delete("1.0","end")
+
     def f_validate_grid(x):
         #Iterating through cells
         for q,entry in enumerate(x.entries):
@@ -876,6 +969,67 @@ class front_end:
                     x.entries[q]['fg']='#0000ff'
                 else:
                     x.entries[q]['fg']='#000000'
+
     def f_do_nothing(x):
         #This function does nothing.
         pass
+
+
+    def f_train_digits(x):
+        #Disable start, back
+        x.startB["fg"] = '#FF0000'
+        x.backB["fg"] = '#FF0000'
+        x.epochsLabel["fg"] = '#FF0000'
+        
+        x.startB["command"] = x.f_do_nothing
+        x.backB["command"] = x.f_do_nothing
+
+        t = threading.Thread(target=x.train_digit_model)
+        t.start()
+
+
+    def f_train_grid(x):
+        #Disable start, back
+        x.startB["fg"] = '#FF0000'
+        x.backB["fg"] = '#FF0000'
+        x.epochsLabel["fg"] = '#FF0000'
+        
+        x.startB["command"] = x.f_do_nothing
+        x.backB["command"] = x.f_do_nothing
+
+        t = threading.Thread(target=x.train_grid_model)
+        t.start()
+
+        
+    def train_digit_model(x):
+        try:
+            epoch_rate = int(x.epochsEntry.get())
+            train_obj = train(x.win)
+            train_obj.train_digits(epoch_rate)
+            x.startB["fg"] = '#000000'
+        except:
+            pass
+        
+        #Re-enable start, back
+        x.backB["fg"] = '#000000'
+        x.epochsLabel["fg"] = '#000000'
+        
+        x.startB["command"] = x.f_train_digits
+        x.backB["command"] = x.s_home
+
+
+    def train_grid_model(x):
+        try:
+            epoch_rate = int(x.epochsEntry.get())
+            train_obj = train(x.win)
+            train_obj.train_grid(epoch_rate)
+            x.startB["fg"] = '#000000'
+        except:
+            pass
+        
+        #Re-enable start, back
+        x.backB["fg"] = '#000000'
+        x.epochsLabel["fg"] = '#000000'
+        
+        x.startB["command"] = x.f_train_grid
+        x.backB["command"] = x.s_home
