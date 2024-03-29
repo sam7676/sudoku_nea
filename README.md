@@ -3,13 +3,16 @@
 This is my first project which I used for my A level Computer Science NEA (non-exam assessment), which was worth 20% of my A level grade.
 I initially set out to create a Sudoku solver as I was regularly playing the game at the time, and this was completed relatively quickly. 
 However, I wanted to try out neural networks for the first time, and so I built an object detection system / R-CNN, allowing inputting of a Sudoku grid from an image.
-I also needed for my project to have some sort of persistent storage, so I created a database storing name, grid, time and date.
 
-This was then all merged to build a full-scale app using Tkinter. 
-Most of my time was spent developing an additional hint system that fetches the grid from the application and figures out the next move to do.
-Putting all this together I created this fully-working Sudoku app.
+Features:
+- **Solver**: I developed my own constraint programming solver, able to use information about the board to update it and reduce possibilities, similar to how a human would play Sudoku. I also incorporated code for Algorithm X, an optimised backtracking solver, which is used to quickly get the number of solutions to a given grid.
+- **Hint feature**: Utilising the constraint programming solver, a human can click on the hint feature for labelled suggestions on what to do next. Repeatedly clicking the hint feature will result in the constraint solver completing the game for you.
+- **Generator**: A feature capable of generating a Sudoku grid with a unique solution. Difficulty levels are also included, which are based on the number of iterations the generator may take. I utilised Algorithm X to randomly create a solved game, and I removed numbers repeatedly until the game was unique. Finally, I evaluated how long this game would take to solve using my constraint solver.
+- **Leaderboard**: Once players complete the game, they may upload their name, the grid they solved, and the time taken, to a leaderboard. This leaderboard can be searched by name and grid to find grids previously players have completed and compare scores.
+- **Object detection system**: This system is capable of inputting any given image, searching this image for any Sudoku grids, grabbing the grid using a bounding box, reading the numbers in the grid, and inputting it into the application to play. Also, this is a self-updating system, and images sent in are used for training and are uploaded using a data pipeline. This uses selective search to find regions of high interest within the initial image, then a neural network to choose the region with maximal probability of being a grid. This grid is then split up into 81 cells, which go through a second neural network for classifying the digits.
+- **Reinforcement learning trainer**: This feature is more of a play-around feature, but users can upload a 4x4 grid with a unique solution and watch a Deep Q-Network attempt to learn to backtrack. Initially, the trainer attempts randomly guessing the value of each cell, however it can begin to learn whether a given guess is good or bad and eventually is able to learn the solution.
 
 If you want to understand the code, I have inserted comments everywhere roughly explaining what each code section does. Additionally, in imports.py, I have documented all my important subroutines and useful class attributes and explained what they do.
 
-To get it to work, download all the files, install all necessary libraries, click on "Debug" upon launch and train both the digits and grid to get the neural networks.
-Note that these files are big, may take several minutes to train (depending on your processing power), and take up to 500MB each.
+To get it to work, download all the files, install all necessary libraries, click on "Train" upon launch and train both the digits and grid to save the neural networks to your machine.
+Note that these files are big, may take several minutes to train (depending on your processing power), and may take up to 500MB each.
