@@ -30,6 +30,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+from matplotlib.figure import Figure 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import keras 
+import threading
 
 
 
@@ -40,7 +44,6 @@ split_rate = 0.8                #splitting training and test data of NN
 pval = 0.999                    #minimal probability for a grid prediction to be accurate
 meanpval =0.5                   #mean of 5 items, if lower then terminate grid selection
 img_set = 5                     #size of stack for taking the mean of
-epoch_rate = 15                 #number of iterations of neural network training
 rl_grid_size = 4
 gen_difficulty = [[0,1],[30,1],[100,2],[250,3]]
 grid_model_location =   'models\\grid_model.h5'
@@ -53,7 +56,7 @@ img_lb =                'images\\leaderboard.png'
 img_optns =             'images\\options.png'
 img_upload =            'images\\upload.png'
 img_win =               'images\\win.png'
-img_debug =             'images\\debug.png'
+img_train =             'images\\train.png'
 img_generate =          'images\\generate.png'
 img_1x1 =               'images\\1x1.png'
 img_custom =            'images\\custom.png'
