@@ -173,8 +173,11 @@ def expand(inp):
 # generate.init()                   -> returns valid grid in string form  
 
 ' training.py                       '
-# train_grid()                      -> trains grid model from grid images in folder     
-# train_digits()                    -> trains digit model from digit images in folder  
+# train_grid(epochs)                -> trains grid model from grid images in folder     
+# train_digits(epochs)              -> trains digit model from digit images in folder  
+
+' reinforcement.py                  '
+# RLTrain.run(grid,memory,episodes) -> runs reinforcement learning on a given grid to try and learn the solution
 
 ' useful attributes                 '
 # convert.saving                    -> whether saving is allowed for current converter object
