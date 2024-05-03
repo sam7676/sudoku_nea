@@ -82,3 +82,8 @@ models
     // weights provided
 images
     // any images loaded into the client
+
+Project scope ideas
+- Build into web app, expand into cloud
+- Build into mobile app
+- I want to try AR but this is a long way off
