@@ -16,3 +16,45 @@ If you want to understand the code, I have inserted comments everywhere roughly 
 
 To get it to work, download all the files, install all necessary libraries, click on "Train" upon launch and train both the digits and grid to save the neural networks to your machine.
 Note that these files are big, may take several minutes to train (depending on your processing power), and may take up to 500MB each.
+
+
+CURRENTLY REVAMPING SUDOKU_NEA
+
+SmartSudoku
+
+- Client application
+- Server in the background
+- Pairing works through the server
+
+Login
+Register
+
+Play
+Leaderboard
+Multiplayer
+Train
+Sign out
+
+[Play]
+Generate
+Create custom
+Image upload
+Back
+
+[Leaderboard]
+Board times
+ELO ranking
+
+[Multiplayer]
+Your ELO
+Random match
+Play a friend [enter username]
+
+Server
+Table 1
+Username | password (hashed) | ELO
+
+Table 2
+Username | board ID | date | time taken
+
+Need to decide where to run training
