@@ -57,4 +57,28 @@ Username | password (hashed) | ELO
 Table 2
 Username | board ID | date | time taken
 
-Need to decide where to run training
+Training will be ran on server, and compiled into client
+
+Codebase:
+server 
+    database.py
+    database.sqlite
+    yolo_training.py
+    digit_training.py
+    compile_client.py // converts client application into .exe file
+    multiplayer_hosting.py
+    host_server.py // calls other files with a HTTP call
+client
+    // bundled into .exe
+    solver.py
+    object_detection.py
+    front_end.py
+    multiplayer.py
+digits
+    // images with annotations
+grids
+    // images with annotations
+models
+    // weights provided
+images
+    // any images loaded into the client
