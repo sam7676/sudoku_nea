@@ -65,12 +65,11 @@ server
     database.sqlite
     yolo_training.py
     digit_training.py
-    compile_client.py // converts client application into .exe file
     multiplayer_hosting.py
-    host_server.py // calls other files with a HTTP call
+    run_server.py // calls other files with a HTTP call
 client
     // bundled into .exe
-    solver.py
+    solver.py [updated]
     object_detection.py
     front_end.py
     multiplayer.py
