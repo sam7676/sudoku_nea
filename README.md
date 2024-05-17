@@ -20,6 +20,13 @@ Note that these files are big, may take several minutes to train (depending on y
 
 CURRENTLY REVAMPING SUDOKU_NEA
 
+## Todo
+- Modify object detection system to make it faster and use YOLO
+- Improve game UI by allowing clicking for notes
+- Incorporate multiplayer
+- Include Killer Sudoku (long way off lol)
+
+
 SmartSudoku
 
 - Client application
@@ -83,6 +90,7 @@ images
     // any images loaded into the client
 
 Project scope ideas
+- Killer Sudoku
 - Build into web app, expand into cloud
 - Build into mobile app
 - I want to try AR but this is a long way off
