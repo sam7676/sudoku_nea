@@ -33,3 +33,7 @@ This project is currently being expanded heavily - I am currently working on/loo
 - **ELO ranking system**: Matches will have the option to be competitive, using an ELO system to amend rankings after each match
 - **Multiplayer play-together**: Users will be able to collaborate together on a grid, sharing notes in real-time
 - **Killer Sudoku**: Will implement Killer Sudoku once I've done all the above  
+
+### Legacy (working version)
+If you would like to tryout the legacy version of this application, check out the link below:  
+https://github.com/sam7676/sudoku_nea/tree/df9d3c556937f8632f38d3170dc2bb4d8edaa396
