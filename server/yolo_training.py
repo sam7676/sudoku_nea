@@ -10,13 +10,13 @@ def main():
     model = YOLO("yolov8n.yaml")
 
     if gpu_enabled:
-        epochs = 100
+        epochs = 300
         
         # Cuda support
         # https://pytorch.org/get-started/locally/ 
         model.to('cuda')
     else:
-        epochs = 30
+        epochs = 100
 
 
     model.train(data="server/dataset.yaml", epochs=epochs)  # train the model
