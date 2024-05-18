@@ -1,0 +1,6 @@
+path: ./sudoku/grids
+train: images/train
+val: images/validation
+test: images/test
+names:
+  0: grid
