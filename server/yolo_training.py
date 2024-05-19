@@ -35,6 +35,7 @@ def main():
 
     if latest_model_path is not None:
         shutil.copy(latest_model_path, 'server/grid_model.pt')
+        shutil.copy(latest_model_path, 'client/grid_model.pt')
 
 if __name__ == '__main__':
     main()
