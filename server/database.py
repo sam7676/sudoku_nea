@@ -3,6 +3,7 @@ import sqlite3
 import datetime
 import hashlib #Python's hash function is non-deterministic, so this is necessary
 import random
+import os
 
 # Note 1: an image file referencing the design of the database system and table relationships
 # can be seen in this directory
@@ -240,7 +241,7 @@ def check_access_token_validity(token):
     if not is_access_token_used(cursor, token):
 
         close_connection(connection, cursor)
-        return False
+        return None
     
     else:
         query = cursor.execute('SELECT * FROM AccessTokens WHERE AccessToken = ?', (token,))
@@ -254,11 +255,11 @@ def check_access_token_validity(token):
         if date >= past:
             playerID = result[1]
             close_connection(connection, cursor)
-            return playerID, token
+            return playerID
 
         else:
             close_connection(connection, cursor)
-            return False
+            return None
 
 # Creates a new access token and allocates it to a given user
 def create_access_token(cursor, playerID):
@@ -272,3 +273,9 @@ def create_access_token(cursor, playerID):
     cursor.execute('INSERT INTO AccessTokens (AccessToken, PlayerID, DATE) VALUES (?, ?, ?)', (token, playerID, date))
 
     return token
+
+
+
+
+if not os.path.exists(database_location):
+    create_db()
