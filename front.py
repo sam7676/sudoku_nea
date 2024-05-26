@@ -2,7 +2,7 @@ from converter import *
 from solver import *
 from training import *
 from imports import *
-from database import *
+from db import *
 
 class front_end:
     def __init__(x):
