@@ -18,12 +18,15 @@ https://github.com/sam7676/sudoku_nea/tree/df9d3c556937f8632f38d3170dc2bb4d8edaa
 
 ---
 ### Current state
-This project is currently being expanded heavily - I am currently working on/look to improve in the future:
+This project is currently being expanded heavily.   
+So far, I have:   
+- implemented an account system with logins
+- separated the project into a client exe and a server application to support multiple users running the same server
+
+To-do - I am currently working on/look to improve in the future:   
 - rewriting the codebase to clean up any messiness set from a few years ago
 - improving the app's UI
-- implementing an account system with logins
 - using YOLO instead of R-CNN for a massive speed increase
-- separating the project into a client exe and a server application to support multiple users running the same server
 - introducing multiplayer
 - adding support for killer sudoku
 - adding a killer sudoku solver
