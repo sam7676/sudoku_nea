@@ -15,6 +15,8 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 import threading
 
+import socketio
+
 image_location =        'images'
 img_logo =              'images\\logo.png'
 img_lb =                'images\\leaderboard.png'
@@ -25,6 +27,8 @@ img_train =             'images\\train.png'
 img_generate =          'images\\generate.png'
 img_1x1 =               'images\\1x1.png'
 img_custom =            'images\\custom.png'
+
+pval = 0.95
 
 
 
@@ -59,17 +63,96 @@ def add_result(): pass
 def train(): pass
 
 
+widget_width = 29
+widget_height = 2
+widget_relief = tk.RAISED
+widget_font = None
+widget_title_font = None
+widget_foreground = '#5B0000'
+
+# TODO: figure out how to incorporate fonts into this app
+
+# widget_font = font.Font(family="TkDefaultFont",size=11,weight="normal")
+# widget_title_font = font.Font(family="TkDefaultFont",size=12,weight="normal")
+
+# Overloading tkinter labels, inputs, buttons to provide style immediately
+class Label(tk.Label):
+    def __init__(self, text=None, width=widget_width, height=widget_height, relief=widget_relief, fg=widget_foreground):
+        super().__init__(text=text,
+                         width=width,
+                         height=height,
+                         relief=relief,
+                         fg=fg)
+class Button(tk.Button): #is modifying the command supported?? TODO needs testing
+    def __init__(self, text=None, command=lambda *args: None, width=widget_width, height=widget_height, relief=widget_relief, fg=widget_foreground):
+        super().__init__(text=text,
+                         width=width,
+                         height=height,
+                         relief=relief,
+                         fg=fg,
+                         command=command)
+class Entry(tk.Entry):
+    def __init__(self,text=None, width=widget_width, height=widget_height, relief=widget_relief, fg=widget_foreground):
+        super().__init__(text=text,
+                         width=width,
+                         relief=relief,
+                         fg=fg)
+
+
+
+# Attempt to connect to server. If not, offline mode
+# Attempt to login and skip
+# Menu screen with Play offline, Login, Register
+
+
+
+
+
 class front_end:
+
+    # Initialises the application
     def __init__(self):
         #Create window
         self.win=tk.Tk()
         self.win.resizable(False, False)
-        self.screen_login()
+        
+        #Get access token
+        token = open('client/access_token.txt','r').readline()
+
+        #Configure app login options
+        self.online_mode = True
+        self.playerID = None
+
+        #Attempt to login
+        try:
+            #Generate socket to connect to server
+            self.socket = socketio.SimpleClient()
+            self.socket.connect('http://localhost:5000')
+
+            # Attempting to validate token and verify login
+            self.socket.emit('check_token', {"token":token})
+            result = self.socket.receive()
+
+            # Parsing JSON to receive potential player ID
+            result = result[1]["result"]
+
+            if result is not None:
+                self.playerID = result
+
+        except:
+            self.socket = None
+            self.online_mode = False
+
+
+        #Login, or go offline mode
+        if self.online_mode == False or self.playerID is not None:
+            self.screen_home()
+
+        self.screen_menu()
         plt.ion()
 
-
+    # Function for clearing the window and restarting it
     def reset_window(self):
-        #Create window
         self.win.destroy()
         self.win = tk.Tk()
         self.win.title('')
@@ -77,71 +160,177 @@ class front_end:
         o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
         self.win.iconphoto(False, o1x1_logo)
 
+
+
+    # Menu screen for anyone not able to automatically login
+    def screen_menu(self):
+        self.reset_window()
+
+        offline_screen_button = Button("Play offline", self.offline_transition)
+        offline_screen_button.grid(row=0)
+
+
+        login_screen_button = Button("Login", self.screen_login)
+        login_screen_button.grid(row=1)
+
+        register_screen_button = Button("Register", self.screen_register)
+        register_screen_button.grid(row=2)
+
+
+        self.win.mainloop()
+
+    # Used to trigger offline mode
+    def offline_transition(self):
+        self.online_mode = False
+        self.socket.disconnect()
+        self.screen_home()
+
+    # Login screen
     def screen_login(self):
 
         self.reset_window()
-
-        #Style
-        w,h,rel=29,2,tk.RAISED
-        f_title = font.Font(family="TkDefaultFont",size=12,weight="normal")
-        f_name = font.Font(family="TkDefaultFont",size=11,weight="normal")
         
-        login_label = tk.Label(text='Login',
-            width=w,height=1,font=f_name,fg='#5B0000')
-
-
+        login_label = Label("Login")
         login_label.grid(row=0)
 
+        username_label = Label('Username:')
+        self.username_input = Entry()
+
+        username_label.grid(row=1,column=0)
+        self.username_input.grid(row=1,column=1)
+        
+        password_label = Label("Password:")
+        self.password_input = Entry()
+
+        password_label.grid(row=2,column=0)
+        self.password_input.grid(row=2,column=1)
+        
+        submit_button = Button("Go", self.attempt_login)
+        submit_button.grid(row=3,column=0)
+
+        back_button = Button("Back",self.screen_menu)
+        back_button.grid(row=3,column=1)
+
         self.win.mainloop()
 
+    # Helper function for screen_login
+    def attempt_login(self):
+
+        username = self.username_input.get()
+        password = self.password_input.get()
+
+        # Attempting to login
+        self.socket.emit('attempt_login', {"username":username, "password":password})
+        json = self.socket.receive()[1]
+
+        playerID = json["id"]
+        token = json["token"]
+
+        if playerID is not None:
+            self.playerID = playerID
+
+            token_file = open('client/access_token.txt','w')
+            token_file.write(token)
+            token_file.close()
+            self.screen_home()
+
+    # Register screen
+    def screen_register(self):
+        self.reset_window()
+
+        username_label = Label("Username")
+        self.username_input = Entry()
+
+        username_label.grid(row=0,column=0)
+        self.username_input.grid(row=0,column=1)
+
+        password_label = Label("Password")
+        self.password_input = Entry()
+
+        password_label.grid(row=1,column=0)
+        self.password_input.grid(row=1,column=1)
+
+        register_button = Button("Register", self.attempt_register)
+
+        register_button.grid(row=2,column=0)
+
+        back_button = Button("Back", self.screen_menu)
+        back_button.grid(row=2,column=1)
+
+        self.win.mainloop()
+
+    # Helper function for screen_register
+    def attempt_register(self):
+
+        username = self.username_input.get()
+        password = self.password_input.get()
+
+        # Attempting to register
+        self.socket.emit('attempt_login', {"username":username, "password":password})
+        json = self.socket.receive()[1]
+
+        playerID = json["id"]
+        token = json["token"]
+
+        if playerID is not None:
+            self.playerID = playerID
+
+            token_file = open('client/access_token.txt','w')
+            token_file.write(token)
+            token_file.close()
+            self.screen_home()
+
+
+
+
+    # Home page
+    def screen_home(self):
+        self.reset_window()
+
+       
+        play_button = Button("Play", self.screen_play_options)
+        play_button.grid(row=0)
+
+        if self.online_mode:
+
+            multiplayer_button = Button("Multiplayer", self.screen_multiplayer)
+
+            leaderboard_button = Button("Leaderboard", self.screen_leaderboard)
+
+            log_out_button = Button("Log out", self.log_out)
+
+            multiplayer_button.grid(row=1)
+            leaderboard_button.grid(row=2)
+            log_out_button.grid(row=3)
+
+        exit_button = Button("Exit", self.win.destroy)
+
+        exit_button.grid(row=4)
+
+        self.win.mainloop()
+
+    # Helper function to log out of account
+    def log_out(self):
+
+        # Clearing the access token ID
+        file = open('client/access_token.txt','w')
+        file.write('')
+        file.close()
+
+        self.playerID = None
+        self.screen_menu()
         
 
 
 
 
 
-    def s_home(self):
-        #Create window
-        self.win.destroy()
-        self.win = tk.Tk()
-        self.win.title('')
-        self.win.resizable(False, False)
-        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
-        self.win.iconphoto(False, o1x1_logo)
 
-        #Style and logo
-        w,h,rel=29,2,tk.RAISED
-        f_title = font.Font(family="TkDefaultFont",size=12,weight="normal")
-        f_name = font.Font(family="TkDefaultFont",size=11,weight="normal")
-        logo = ImageTk.PhotoImage(Image.open(img_logo))
-        logoL = tk.Label(image=logo)
-        
-        #Name and frame
-        nameL = tk.Label(text='github.com/sam7676',
-            width=w,height=1,font=f_name,fg='#5B0000')
-        frame1 = tk.Frame()
 
-        #Buttons
-        playB = tk.Button(text='Play',command=self.s_play_options,
-            master=frame1,width=w,height=h,font=f_title,relief=rel)
-        leaderboardB = tk.Button(text='Leaderboard',command=self.s_leaderboard,
-            master=frame1,width=w,height=h,font=f_title,relief=rel)
-        trainB = tk.Button(text='Train',command=self.s_train,
-            master=frame1,width=w,height=h,font=f_title,relief=rel)
-        exitB = tk.Button(text='Exit',command=self.win.destroy,
-            master=frame1,width=w,height=h,font=f_title,relief=rel)
 
-        #Placing in GUI
-        logoL.grid(row=0)
-        nameL.grid(row=1)
-        frame1.grid(row=2)
-        playB.grid(row=0)
-        leaderboardB.grid(row=1)
-        trainB.grid(row=2)
-        exitB.grid(row=3)
-        self.win.mainloop()
 
-    def s_play_options(self): 
+
+    def screen_play_options(self): 
         #Create window, set style
         self.win.destroy()
         self.win = tk.Tk()
@@ -165,7 +354,7 @@ class front_end:
             font=f_main,width=w,height=2,relief=play_relief)
         uploadB = tk.Button(text='Upload',command=self.s_upload_stage_1,
             font=f_main,width=w,height=2,relief=play_relief)
-        backB = tk.Button(text='Back',command=self.s_home,
+        backB = tk.Button(text='Back',command=self.screen_home,
             font=f_main,width=w,height=2,relief=play_relief)
         
         #GUI
@@ -431,7 +620,7 @@ class front_end:
         searchGridB = tk.Label(master=miniFrame1,text='Search grid',font=f_main,width=grid_w)
         self.searchGridE = tk.Entry(master=miniFrame1,width=grid_w)
         searchB = tk.Button(text='Search',command=self.f_return_query,master=miniFrame2,height=2,font=f_main,width=14)
-        backB = tk.Button(text='Back',command=self.s_home,master=miniFrame2,height=2,font=f_main,width=14)
+        backB = tk.Button(text='Back',command=self.screen_home,master=miniFrame2,height=2,font=f_main,width=14)
 
         #GUI stuff
         leaderboardL.grid(row=0)
@@ -545,7 +734,7 @@ class front_end:
         train_grid_b = tk.Button(text='Train grid',font=f_main,command=self.s_train_grid,width=w,height=2)
         train_rl_b = tk.Button(text='Train RL solver',font=f_main,command=self.s_train_rl,width=w,height=2)
         clear_LB_b = tk.Button(text='Clear leaderboard',font=f_main,command=clear_table,width=w,height=2)
-        backB = tk.Button(text='Back',command=self.s_home,font=f_main,width=w,height=2)
+        backB = tk.Button(text='Back',command=self.screen_home,font=f_main,width=w,height=2)
 
         #GUI
         trainL.grid(row=0,column=0)
@@ -569,7 +758,7 @@ class front_end:
         w=80
 
         self.startB = tk.Button(text='Start digit training', command=self.f_train_digits,font=f_main,width=w,height=2)
-        self.backB = tk.Button(text='Back',command=self.s_home,font=f_main,width=w,height=2)
+        self.backB = tk.Button(text='Back',command=self.screen_home,font=f_main,width=w,height=2)
         self.epochsLabel = tk.Label(text="Epochs",font=f_main,width=w,height=2,relief=tk.RAISED)
         self.epochsEntry = tk.Entry(font=f_main,width=w,justify="center")
         self.epochsEntry.insert(0,"15")
@@ -593,7 +782,7 @@ class front_end:
         w=80
 
         self.startB = tk.Button(text='Start grid training', command=self.f_train_grid,font=f_main,width=w,height=2)
-        self.backB = tk.Button(text='Back',command=self.s_home,font=f_main,width=w,height=2)
+        self.backB = tk.Button(text='Back',command=self.screen_home,font=f_main,width=w,height=2)
         self.epochsLabel = tk.Label(text="Epochs",font=f_main,width=w,height=2,relief=tk.RAISED)
         self.epochsEntry = tk.Entry(font=f_main,width=w,justify="center")
         self.epochsEntry.insert(0,"15")
@@ -620,7 +809,7 @@ class front_end:
         # want a matplotlib graph that self updates and displays in tkinter
 
         startB = tk.Button(text='Start RL training', command=self.f_do_nothing,font=f_main,width=w,height=2)
-        backB = tk.Button(text='Back',command=self.s_home,font=f_main,width=w,height=2)
+        backB = tk.Button(text='Back',command=self.screen_home,font=f_main,width=w,height=2)
 
         #GUI
         startB.grid(row=0)
@@ -1009,7 +1198,7 @@ class front_end:
                 else:
 
                     #if clipboard is grid string
-                    stri = flatten(clip)
+                    stri = clip
                     k = algorithm_x(stri)
                     if k.sols==1:
                         self.s_game(stri)
@@ -1112,7 +1301,7 @@ class front_end:
         self.epochsLabel["fg"] = '#000000'
         
         self.startB["command"] = self.f_train_digits
-        self.backB["command"] = self.s_home
+        self.backB["command"] = self.screen_home
 
 
     def train_grid_model(self):
@@ -1129,7 +1318,16 @@ class front_end:
         self.epochsLabel["fg"] = '#000000'
         
         self.startB["command"] = self.f_train_grid
-        self.backB["command"] = self.s_home
+        self.backB["command"] = self.screen_home
+
+
+    def screen_multiplayer(self):
+        pass
+
+    def screen_leaderboard(self):
+        pass
+
+
 
 
 y = front_end()
