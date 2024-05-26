@@ -1,10 +1,10 @@
 __pycache__/
 _old/
 models/
-pseudocode.py
 
 server/secret.py
 grids/images
 grids/labels
 runs
 server/yolo_inference.py
+server/database.sqlite3
