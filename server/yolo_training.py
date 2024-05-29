@@ -16,7 +16,7 @@ def main():
         # https://pytorch.org/get-started/locally/ 
         model.to('cuda')
     else:
-        epochs = 100
+        epochs = 150
 
 
     model.train(data="server/dataset.yaml", epochs=epochs)  # train the model
