@@ -72,37 +72,50 @@ widget_foreground = '#5B0000'
 
 # TODO: figure out how to incorporate fonts into this app
 
-# widget_font = font.Font(family="TkDefaultFont",size=11,weight="normal")
-# widget_title_font = font.Font(family="TkDefaultFont",size=12,weight="normal")
-
-# Overloading tkinter labels, inputs, buttons to provide style immediately
-class Label(tk.Label):
-    def __init__(self, text=None, width=widget_width, height=widget_height, relief=widget_relief, fg=widget_foreground):
-        super().__init__(text=text,
-                         width=width,
-                         height=height,
-                         relief=relief,
-                         fg=fg)
-class Button(tk.Button): #is modifying the command supported?? TODO needs testing
-    def __init__(self, text=None, command=lambda *args: None, width=widget_width, height=widget_height, relief=widget_relief, fg=widget_foreground):
-        super().__init__(text=text,
-                         width=width,
-                         height=height,
-                         relief=relief,
-                         fg=fg,
-                         command=command)
-class Entry(tk.Entry):
-    def __init__(self,text=None, width=widget_width, height=widget_height, relief=widget_relief, fg=widget_foreground):
-        super().__init__(text=text,
-                         width=width,
-                         relief=relief,
-                         fg=fg)
-
-
-
 # Attempt to connect to server. If not, offline mode
 # Attempt to login and skip
 # Menu screen with Play offline, Login, Register
+
+
+# Custom function, applying a default style to Tkinter widgets
+def grid(obj, row=0, col=0, 
+          font_type=None, width=29, height=2, 
+          relief=tk.RAISED, foreground='#5B0000'):
+
+    #provides style to a Tkinter object
+    widget_font = font.Font(family="TkDefaultFont",size=11,weight="normal")
+    widget_title_font = font.Font(family="TkDefaultFont",size=12,weight="normal")
+
+
+    if font_type == None:
+        object_font = widget_font
+    elif font_type.lower() == 'title':
+        object_font = widget_title_font
+    elif font_type.lower() == 'regular':
+        object_font = widget_font
+    else:
+        raise Exception("Error with font passed in")
+
+    if type(obj) in (tk.Label, tk.Button, tk.Text):
+        obj.configure(font=object_font,
+                    width=width,
+                    height=height,
+                    relief=relief,
+                    fg=foreground)
+        
+    elif type(obj) == tk.Entry:
+        obj.configure(width=width,
+                      relief=relief,
+                      fg=foreground)
+            
+    elif type(obj) == tk.Frame: pass
+    else: raise Exception("Tk type not recognised")
+
+    obj.grid(row=row,column=col)
+    
+
+
+
 
 
 
@@ -166,16 +179,15 @@ class front_end:
     def screen_menu(self):
         self.reset_window()
 
-        offline_screen_button = Button("Play offline", self.offline_transition)
-        offline_screen_button.grid(row=0)
+        offline_screen_button = tk.Button(text="Play offline", command=self.offline_transition)
+        grid(offline_screen_button, row=0)
 
 
-        login_screen_button = Button("Login", self.screen_login)
-        login_screen_button.grid(row=1)
+        login_screen_button = tk.Button(text="Login", command=self.screen_login)
+        grid(login_screen_button,row=1)
 
-        register_screen_button = Button("Register", self.screen_register)
-        register_screen_button.grid(row=2)
-
+        register_screen_button = tk.Button(text="Register", command=self.screen_register)
+        grid(register_screen_button,row=2)
 
         self.win.mainloop()
 
@@ -190,26 +202,27 @@ class front_end:
 
         self.reset_window()
         
-        login_label = Label("Login")
-        login_label.grid(row=0)
+        login_label = tk.Label(text="Login")
+        grid(login_label, row=0)
 
-        username_label = Label('Username:')
-        self.username_input = Entry()
+        username_label = tk.Label(text='Username:')
+        self.username_input = tk.Entry()
 
-        username_label.grid(row=1,column=0)
-        self.username_input.grid(row=1,column=1)
+        grid(username_label, row=1, col=0)
+        grid(self.username_input, row=1, col=1)
         
-        password_label = Label("Password:")
-        self.password_input = Entry()
+        password_label = tk.Label(text="Password:")
+        self.password_input = tk.Entry()
 
-        password_label.grid(row=2,column=0)
-        self.password_input.grid(row=2,column=1)
+        grid(password_label, row=2, col=0)
+        grid(self.password_input, row=2, col=1)
+
         
-        submit_button = Button("Go", self.attempt_login)
-        submit_button.grid(row=3,column=0)
+        submit_button = tk.Button(text="Go", command=self.attempt_login)
+        grid(submit_button, row=3, col=0)
 
-        back_button = Button("Back",self.screen_menu)
-        back_button.grid(row=3,column=1)
+        back_button = tk.Button(text="Back",command=self.screen_menu)
+        grid(back_button, row=3, col=1)
 
         self.win.mainloop()
 
@@ -238,24 +251,25 @@ class front_end:
     def screen_register(self):
         self.reset_window()
 
-        username_label = Label("Username")
-        self.username_input = Entry()
+        username_label = tk.Label(text="Username")
+        self.username_input = tk.Entry()
 
-        username_label.grid(row=0,column=0)
-        self.username_input.grid(row=0,column=1)
+        grid(username_label, row=0, col=0)
+        grid(self.username_input, row=0, col=1)
 
-        password_label = Label("Password")
-        self.password_input = Entry()
+        password_label = tk.Label(text="Password")
+        self.password_input = tk.Entry()
 
-        password_label.grid(row=1,column=0)
-        self.password_input.grid(row=1,column=1)
+        grid(password_label, row=1, col=0)
+        grid(self.password_input, row=1, col=1)
 
-        register_button = Button("Register", self.attempt_register)
+        register_button = tk.Button(text="Register", command=self.attempt_register)
 
-        register_button.grid(row=2,column=0)
+        grid(register_button, row=2, col=0)
 
-        back_button = Button("Back", self.screen_menu)
-        back_button.grid(row=2,column=1)
+        back_button = tk.Button(text="Back", command=self.screen_menu)
+        
+        grid(back_button, row=2, col=1)
 
         self.win.mainloop()
 
@@ -288,24 +302,26 @@ class front_end:
         self.reset_window()
 
        
-        play_button = Button("Play", self.screen_play_options)
-        play_button.grid(row=0)
+        play_button = tk.Button(text="Play", command=self.screen_play_options)
+
+
+        grid(play_button, row=0)
 
         if self.online_mode:
 
-            multiplayer_button = Button("Multiplayer", self.screen_multiplayer)
+            multiplayer_button = tk.Button(text="Multiplayer", command=self.screen_multiplayer)
 
-            leaderboard_button = Button("Leaderboard", self.screen_leaderboard)
+            leaderboard_button = tk.Button(text="Leaderboard", command=self.screen_leaderboard)
 
-            log_out_button = Button("Log out", self.log_out)
+            log_out_button = tk.Button(text="Log out", command=self.log_out)
 
-            multiplayer_button.grid(row=1)
-            leaderboard_button.grid(row=2)
-            log_out_button.grid(row=3)
+            grid(multiplayer_button, row=1)
+            grid(leaderboard_button, row=2)
+            grid(log_out_button, row=3)
 
-        exit_button = Button("Exit", self.win.destroy)
+        exit_button = tk.Button(text="Exit", command=self.win.destroy)
 
-        exit_button.grid(row=4)
+        grid(exit_button, row=4)
 
         self.win.mainloop()
 
@@ -321,91 +337,65 @@ class front_end:
         self.screen_menu()
         
 
-
-
-
-
-
-
-
-
-
+    # Play options
     def screen_play_options(self): 
-        #Create window, set style
-        self.win.destroy()
-        self.win = tk.Tk()
-        self.win.title('')
-        self.win.resizable(False, False)
-        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
-        self.win.iconphoto(False, o1x1_logo)
-        w=42
-        play_relief = tk.RAISED
-        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
 
-        #Options header
-        optns_image = ImageTk.PhotoImage(Image.open(img_optns))
-        options_label = tk.Label(image=optns_image)
-        options_label.grid(row=0)
-        
-        #Buttons
-        customB = tk.Button(text='Create custom',command=self.s_create_custom_game,
-            font=f_main,width=w,height=2,relief=play_relief)
-        generateB = tk.Button(text='Generate',command=self.s_generate,
-            font=f_main,width=w,height=2,relief=play_relief)
-        uploadB = tk.Button(text='Upload',command=self.s_upload_stage_1,
-            font=f_main,width=w,height=2,relief=play_relief)
-        backB = tk.Button(text='Back',command=self.screen_home,
-            font=f_main,width=w,height=2,relief=play_relief)
-        
-        #GUI
-        customB.grid(row=1)
-        generateB.grid(row=2)
-        uploadB.grid(row=3)
-        backB.grid(row=4)
+        self.reset_window()
+
+        create_custom_button = tk.Button(text="Create custom game", command=self.screen_create_custom_game)
+        generate_button = tk.Button(text="Generate grid", command=self.s_generate)
+        upload_button = tk.Button(text="Upload image", command=self.s_upload_stage_1)
+        back_button = tk.Button(text="Back", command=self.screen_home)
+
+        grid(create_custom_button, row=0)
+        grid(generate_button, row=1)
+        grid(upload_button, row=2)
+        grid(back_button, row=3)
+
         self.win.mainloop()
 
-    def s_create_custom_game(self):
-        #Create window and set style
-        self.win.destroy()
-        self.win = tk.Tk()
-        self.win.title('')
-        self.win.resizable(False, False)
-        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
-        self.win.iconphoto(False, o1x1_logo)
-        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
-        label_w = 14
 
-        #Custom image label
-        custom_image = ImageTk.PhotoImage(Image.open(img_custom))
-        custom_label = tk.Label(image=custom_image)
-        custom_label.grid(row=0)
+    # Creating a custom grid to play
+    def screen_create_custom_game(self):
+        self.reset_window()
 
-        #Frame setup
-        frame1 = tk.Frame()
-        frame2 = tk.Frame()
-        
-        #Grid setup and placing
-        sg=[tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1)]
-        self.entries = [tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3)] 
-        for i,item in enumerate(self.entries):
-            y1 = i//9
-            x1 = i%9
-            item.grid(row=y1%3,column=x1%3)   
-        for i, sub in enumerate(sg):
-            sub.grid(row=i//3,column=i%3,padx=5,pady=5)
+        grid_frame = tk.Frame()
 
-        #Buttons
-        backB = tk.Button(master=frame2,text='Back',command=self.s_play_options,
-            width=label_w,font=f_main)
-        self.confirmB = tk.Button(master=frame2,text='Confirm',command=self.f_check_valid_grid_creation,
-            width=label_w,font=f_main)
-        backB.grid(row=0,column=0)
-        self.confirmB.grid(row=0,column=1)
+        subgrid_frames = [tk.Frame(master=grid_frame) for i in range(9)]
 
-        #GUI final
-        frame1.grid(row=1,column=0)
-        frame2.grid(row=2,column=0)
+        self.entries = []
+
+        for y in range(9):
+            for x in range(9):
+                box_value = 3 * (y//3) + (x//3)
+                self.entries.append(tk.Text(master=subgrid_frames[box_value]))
+                
+        for i, item in enumerate(self.entries):
+            y = i//9
+            x = i%9
+            grid(item, row=y%3, col=x%3, width=6, height=3)
+
+        for i, subgrid in enumerate(subgrid_frames):
+            subgrid.grid(row=i//3,
+                         column=i%3,
+                         padx=5,
+                         pady=5)
+            
+        button_frame = tk.Frame()
+            
+        back_button = tk.Button(text="Back", command=self.screen_play_options, master=button_frame)
+        confirm_button = tk.Button(text="Confirm", command=self.check_valid_grid_creation, master=button_frame)
+
+
+        grid(back_button, row=0, col=0)
+        grid(confirm_button, row=0, col=1)
+
+        grid(grid_frame, row=0)
+        grid(button_frame, row=1)
+
+
         self.win.mainloop()
+
 
     def s_upload_stage_1(self):
         #Create window and style
@@ -428,7 +418,7 @@ class front_end:
             width=button_w,relief=play_relief,font=f_main,height=2)
         self.openFileB = tk.Button(text='Open file',command=self.f_upload_open_file,
             width=button_w,relief=play_relief,font=f_main,height=2)
-        backB = tk.Button(text='Back',command=self.s_play_options,
+        backB = tk.Button(text='Back',command=self.screen_play_options,
             width=button_w,relief=play_relief,font=f_main,height=2)
         
         #GUI
@@ -477,9 +467,9 @@ class front_end:
                 sub.grid(row=i//3,column=i%3,padx=5,pady=5)
 
             #Buttons
-            backB = tk.Button(master=frame2,text='Back',command=self.s_play_options,
+            backB = tk.Button(master=frame2,text='Back',command=self.screen_play_options,
                 font = f_main,width=label_w)
-            self.confirmB = tk.Button(master=frame2,text='Confirm',command=lambda:self.f_check_valid_grid_creation(image_conversion),
+            self.confirmB = tk.Button(master=frame2,text='Confirm',command=lambda:self.check_valid_grid_creation(image_conversion),
                 font = f_main,width=label_w)
             backB.grid(row=0,column=0)
             self.confirmB.grid(row=0,column=1)
@@ -558,7 +548,7 @@ class front_end:
             width=button_w,font=f_button)
         self.solveB = tk.Button(master=frame2,text='Solve',command=self.f_solve_game,
             width=button_w,font=f_button)
-        backB = tk.Button(master=frame2,text='Back',command=self.s_play_options,
+        backB = tk.Button(master=frame2,text='Back',command=self.screen_play_options,
             width=button_w,font=f_button)
         self.checkB.grid(row=0,column=0)
         self.hintB.grid(row=0,column=1)
@@ -662,7 +652,7 @@ class front_end:
             diff_array[i].grid(row=i)
 
         #Other buttons and GUI
-        backB = tk.Button(text='Back',font=f_main,width=w,command=self.s_play_options,height=2)
+        backB = tk.Button(text='Back',font=f_main,width=w,command=self.screen_play_options,height=2)
         generateL.grid(row=0)
         diff_frame.grid(row=1)
         backB.grid(row=3)
@@ -714,157 +704,60 @@ class front_end:
         quit_button.grid(row=7)
         self.win_window.mainloop()
 
-    def s_train(self):
-        #Create window and style
-        self.win.destroy()
-        self.win = tk.Tk()
-        self.win.title('')
-        self.win.resizable(False,False)
-        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
-        self.win.iconphoto(False, o1x1_logo)
-        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
-        w=30
+    def check_valid_grid_creation(self, upload=None):
 
-        #Image
-        train_image = ImageTk.PhotoImage(Image.open(img_train))
-        trainL = tk.Label(image=train_image)
+        grid = []
+        for entry in self.entries:
+            grid.append(entry.get("1.0", tk.END).strip())
 
-        #Buttons
-        train_digits_b = tk.Button(text='Train digits',font=f_main,command=self.s_train_digits,width=w,height=2)
-        train_grid_b = tk.Button(text='Train grid',font=f_main,command=self.s_train_grid,width=w,height=2)
-        train_rl_b = tk.Button(text='Train RL solver',font=f_main,command=self.s_train_rl,width=w,height=2)
-        clear_LB_b = tk.Button(text='Clear leaderboard',font=f_main,command=clear_table,width=w,height=2)
-        backB = tk.Button(text='Back',command=self.screen_home,font=f_main,width=w,height=2)
-
-        #GUI
-        trainL.grid(row=0,column=0)
-        train_digits_b.grid(row=1)
-        train_grid_b.grid(row=2)
-        train_rl_b.grid(row=3)
-        clear_LB_b.grid(row=4)
-        backB.grid(row=5)
-        self.win.mainloop()
-
-    def s_train_digits(self):
-
-        #Create window and style
-        self.win.destroy()
-        self.win = tk.Tk()
-        self.win.title('')
-        self.win.resizable(False,False)
-        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
-        self.win.iconphoto(False, o1x1_logo)
-        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
-        w=80
-
-        self.startB = tk.Button(text='Start digit training', command=self.f_train_digits,font=f_main,width=w,height=2)
-        self.backB = tk.Button(text='Back',command=self.screen_home,font=f_main,width=w,height=2)
-        self.epochsLabel = tk.Label(text="Epochs",font=f_main,width=w,height=2,relief=tk.RAISED)
-        self.epochsEntry = tk.Entry(font=f_main,width=w,justify="center")
-        self.epochsEntry.insert(0,"15")
-
-        #GUI
-        self.startB.grid(row=0)
-        self.backB.grid(row=1)
-        self.epochsLabel.grid(row=2)
-        self.epochsEntry.grid(row=3)
-        self.win.mainloop()
-
-    def s_train_grid(self):
-        #Create window and style
-        self.win.destroy()
-        self.win = tk.Tk()
-        self.win.title('')
-        self.win.resizable(False,False)
-        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
-        self.win.iconphoto(False, o1x1_logo)
-        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
-        w=80
-
-        self.startB = tk.Button(text='Start grid training', command=self.f_train_grid,font=f_main,width=w,height=2)
-        self.backB = tk.Button(text='Back',command=self.screen_home,font=f_main,width=w,height=2)
-        self.epochsLabel = tk.Label(text="Epochs",font=f_main,width=w,height=2,relief=tk.RAISED)
-        self.epochsEntry = tk.Entry(font=f_main,width=w,justify="center")
-        self.epochsEntry.insert(0,"15")
-
-        #GUI
-        self.startB.grid(row=0)
-        self.backB.grid(row=1)
-        self.epochsLabel.grid(row=2)
-        self.epochsEntry.grid(row=3)
-        self.win.mainloop()
-
-    def s_train_rl(self):
-        #Create window and style
-        self.win.destroy()
-        self.win = tk.Tk()
-        self.win.title('')
-        self.win.resizable(False,False)
-        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
-        self.win.iconphoto(False, o1x1_logo)
-        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
-        w=30
-
-        
-        # want a matplotlib graph that self updates and displays in tkinter
-
-        startB = tk.Button(text='Start RL training', command=self.f_do_nothing,font=f_main,width=w,height=2)
-        backB = tk.Button(text='Back',command=self.screen_home,font=f_main,width=w,height=2)
-
-        #GUI
-        startB.grid(row=0)
-        backB.grid(row=1)
-        self.win.mainloop()
-
-    def f_check_valid_grid_creation(self,upload=None):
-
-        #Getting grid from entries (datatype: array, 2D, string items)
-        grid=[]
-        for i in self.entries:
-            grid.append([i.get().strip()])
 
         #Checking that length = 1 in all cases and only 123456789 appear
-        errors=False
-        for i in range(len(grid)):
-            if len(grid[i])>1 or grid[i][0] not in '123456789':
-                self.entries[i]['fg'] = '#ff0000'
-                errors=True
+        error_found = False
+        for i, text in enumerate(grid):
+
+            if len(text) == 0:
+                grid[i] = '0'
+                self.entries[i]['fg'] = '#000000' #All fine, reset colour
+
             else:
-                self.entries[i]['fg'] = '#000000'
+                if len(text) > 1 or text[0] not in '123456789':
+                    self.entries[i]['fg'] = '#ff0000' #Mark it red to specify it needs changing
+                    error_found = True
 
-                #Setting empty to zero and adding to grid string
-                if grid[i][0]=='':
-                    grid[i]='0'
                 else:
-                    grid[i]=grid[i][0]
+                    self.entries[i]['fg'] = '#000000' #All fine, reset colour
+                    grid[i] = text[0]
 
-        #if there are any errors, exit. otherwise:
-        if errors==False:
+
+        if not error_found:
     
-            #Finalising grid, checking only 1 solution, executing
-            grid2 = ''.join(grid)
-            k = algorithm_x(grid2)
-            print(f"Solutions: {k.sols}")
-            if k.sols == 1:
-                
+            # checking only 1 solution to grid
+            grid_string = ''.join(grid)
+
+            result = algorithm_x(grid_string)
+
+            if result.sols == 1:
+
                 #If upload is enabled, save information
                 if upload!=None:
                     if upload.max_predict>pval:
                         upload.train(grid)
 
                 #Go to main game
-                self.s_game(grid2)
+                self.s_game(grid_string)
             
             #If more than 1 solution, use generator and proceed to game
-            elif upload==None and k.sols==2:
-                self.confirmB["fg"]='#000000'
-                y = random.randint(0,len(gen_difficulty)-1)
-                print(f'Difficulty level: {y+1}')
-                self.s_game(generate(gen_difficulty[y],grid2).ans)
+            elif upload==None and result.sols==2:
+
+
+                difficulty = random.randint(0,len(gen_difficulty)-1)
+
+                self.s_game(generate(gen_difficulty[difficulty],
+                                     grid_string).ans)
                 
             else:
 
-                #Error
+                #Error - display using confirm button
                 self.confirmB["fg"] = '#FF0000'
                 
 
