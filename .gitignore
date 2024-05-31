@@ -7,4 +7,5 @@ grids/images
 grids/labels
 runs
 server/yolo_inference.py
+server/digit_inference.py
 server/database.sqlite3
