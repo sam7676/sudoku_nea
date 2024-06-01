@@ -1,4 +1,4 @@
-# sudoku_nea / SmartSudoku
+# sudoku_nea / sudoku_ai
 
 ---
 
