@@ -1,27 +1,18 @@
 import torch
 import torchvision.transforms as transforms 
-import torch.nn as nn 
-from torch.nn import Conv2d
-from torch.nn import Linear
-from torch.nn import MaxPool2d
-from torch.nn import ReLU
-from torch.nn import LogSoftmax
+import torch.nn as nn
 import numpy as np
 import os
 import random
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
-
+from digit_model_architecture import DigitNetwork
 
 # hyperparameters
 batch_size = 64
 learning_rate = 0.001
 split_rate = 0.8
 epochs = 10
-
-
-classes = ('0','1','2','3','4','5','6','7','8','9')
-
 
 training_images = []
 training_labels = []
@@ -84,54 +75,8 @@ test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 
 
+# Creating model (imported)
 
-
-# Model
-
-class DigitNetwork(nn.Module):
-    def __init__(self):
-        super(DigitNetwork, self).__init__()
-
-        # Initial convolutional layer and ReLU loss
-        # Note torch convolutions are dynamic. Image sizes are 64x64
-        self.conv1 = Conv2d(in_channels=1, out_channels=20,
-            kernel_size=(5, 5))
-        self.relu1 = ReLU()
-
-        # Initial pool layer
-        self.maxpool1 = MaxPool2d(kernel_size=(2, 2), stride=(2, 2))
-
-        # After flattening the image, connect to regular NN
-
-        # Fully connected layer
-        self.fc1 = Linear(in_features=20*30*30, out_features=500)
-        self.relu3 = ReLU()
-
-        # Softmax classifier
-        self.classifier = Linear(in_features=500, out_features=len(classes))
-        self.logSoftmax = LogSoftmax(dim=1)
-
-    def forward(self, x):
-
-        # Apply convolution and max pool
-        x = self.conv1(x)
-        x = self.relu1(x)
-        x = self.maxpool1(x)
-
-        # Flatten
-        x = x.view(x.size(0), -1)
-
-        # Deep layer
-        x = self.fc1(x)
-        x = self.relu3(x)
-
-        # pass the output to our softmax classifier to get output prediction
-        x = self.classifier(x)
-        output = self.logSoftmax(x)
-
-        # return the output predictions
-        return output
-    
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 model = DigitNetwork().to(device)
@@ -166,6 +111,7 @@ def train(dataloader, model, loss_fn, optimizer):
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 
+# Testing model
 def test(dataloader, model, loss_fn):
     """ Test the model on the given dataloader.
     Args:
