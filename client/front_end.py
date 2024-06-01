@@ -3,6 +3,7 @@ from solver import *
 from time import perf_counter
 from PIL import Image
 from PIL import ImageTk
+from PIL import ImageDraw
 import random
 import clipboard
 import pyautogui as pg                          # This for some reason modifies the font
@@ -16,6 +17,9 @@ import matplotlib.pyplot as plt
 import threading
 
 import socketio
+
+import object_detection
+
 
 image_location =        'images'
 img_logo =              'images\\logo.png'
@@ -70,7 +74,6 @@ widget_font = None
 widget_title_font = None
 widget_foreground = '#5B0000'
 
-# TODO: figure out how to incorporate fonts into this app
 
 # Attempt to connect to server. If not, offline mode
 # Attempt to login and skip
@@ -78,46 +81,45 @@ widget_foreground = '#5B0000'
 
 
 # Custom function, applying a default style to Tkinter widgets
-def grid(obj, row=0, col=0, 
-          font_type=None, width=29, height=2, 
-          relief=tk.RAISED, foreground='#5B0000'):
+def grid(widget, row=0, col=0, 
+                font_type=None, width=29, height=2, 
+                relief=tk.RAISED, foreground='#5B0000'):
+    """
+    Applies a default style to a Tkinter widget.
 
-    #provides style to a Tkinter object
-    widget_font = font.Font(family="TkDefaultFont",size=11,weight="normal")
-    widget_title_font = font.Font(family="TkDefaultFont",size=12,weight="normal")
+    Args:
+        widget (tk.Widget): The widget to apply the style to.
+        row (int): The row position of the widget in the grid.
+        col (int): The column position of the widget in the grid.
+        font_type (str): The font style to apply to the widget.
+                         Valid values are 'title' or 'regular'.
+        width (int): The width of the widget.
+        height (int): The height of the widget.
+        relief (tk.constants.RELIEF_CONSTANT): The relief style of the widget.
+        foreground (str): The foreground color of the widget.
+    """
+    # Set up default font styles
+    regular_font = font.Font(family="TkDefaultFont",size=11,weight="normal")
+    title_font = font.Font(family="TkDefaultFont",size=12,weight="normal")
+    cell_font = font.Font(family="TkDefaultFont",size=25,weight="normal")
 
-
+    # Determine the font style to apply to the widget
     if font_type == None:
-        object_font = widget_font
-    elif font_type.lower() == 'title':
-        object_font = widget_title_font
-    elif font_type.lower() == 'regular':
-        object_font = widget_font
-    else:
-        raise Exception("Error with font passed in")
+        font_style = regular_font
+    elif font_type == 'title':
+        font_style = title_font
+    elif font_type == 'cell':
+        font_style = cell_font
 
-    if type(obj) in (tk.Label, tk.Button, tk.Text):
-        obj.configure(font=object_font,
-                    width=width,
-                    height=height,
-                    relief=relief,
-                    fg=foreground)
-        
-    elif type(obj) == tk.Entry:
-        obj.configure(width=width,
-                      relief=relief,
-                      fg=foreground)
-            
-    elif type(obj) == tk.Frame: pass
-    else: raise Exception("Tk type not recognised")
+    # Apply the style to the widget
+    if isinstance(widget, (tk.Label, tk.Button, tk.Text)):
+        widget.configure(font=font_style, width=width, height=height, relief=relief, fg=foreground)
+    elif isinstance(widget, tk.Entry):
+        widget.configure(width=width, relief=relief, fg=foreground)
 
-    obj.grid(row=row,column=col)
+    # Place the widget in the grid
+    widget.grid(row=row, column=col)
     
-
-
-
-
-
 
 
 
@@ -125,6 +127,7 @@ class front_end:
 
     # Initialises the application
     def __init__(self):
+
         #Create window
         self.win=tk.Tk()
         self.win.resizable(False, False)
@@ -344,7 +347,7 @@ class front_end:
 
         create_custom_button = tk.Button(text="Create custom game", command=self.screen_create_custom_game)
         generate_button = tk.Button(text="Generate grid", command=self.s_generate)
-        upload_button = tk.Button(text="Upload image", command=self.s_upload_stage_1)
+        upload_button = tk.Button(text="Upload image", command=self.screen_upload)
         back_button = tk.Button(text="Back", command=self.screen_home)
 
         grid(create_custom_button, row=0)
@@ -361,25 +364,7 @@ class front_end:
 
         grid_frame = tk.Frame()
 
-        subgrid_frames = [tk.Frame(master=grid_frame) for i in range(9)]
-
-        self.entries = []
-
-        for y in range(9):
-            for x in range(9):
-                box_value = 3 * (y//3) + (x//3)
-                self.entries.append(tk.Text(master=subgrid_frames[box_value]))
-                
-        for i, item in enumerate(self.entries):
-            y = i//9
-            x = i%9
-            grid(item, row=y%3, col=x%3, width=6, height=3)
-
-        for i, subgrid in enumerate(subgrid_frames):
-            subgrid.grid(row=i//3,
-                         column=i%3,
-                         padx=5,
-                         pady=5)
+        self.build_entry_grid(grid_frame)
             
         button_frame = tk.Frame()
             
@@ -397,96 +382,230 @@ class front_end:
         self.win.mainloop()
 
 
-    def s_upload_stage_1(self):
-        #Create window and style
-        self.win.destroy()
-        self.win = tk.Tk()
-        self.win.title('')
-        self.win.resizable(False, False)
-        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
-        self.win.iconphoto(False, o1x1_logo)
-        play_relief = tk.RAISED
-        button_w = 36
-        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
 
-        #Upload image
-        upload_i = ImageTk.PhotoImage(Image.open(img_upload))
-        upload_L = tk.Label(image=upload_i)
+    def build_entry_grid(self, grid_frame):
+        subgrid_frames = [tk.Frame(master=grid_frame) for i in range(9)]
 
-        #Buttons
-        self.clipboardB = tk.Button(text='Clipboard',command=self.f_check_clipboard,
-            width=button_w,relief=play_relief,font=f_main,height=2)
-        self.openFileB = tk.Button(text='Open file',command=self.f_upload_open_file,
-            width=button_w,relief=play_relief,font=f_main,height=2)
-        backB = tk.Button(text='Back',command=self.screen_play_options,
-            width=button_w,relief=play_relief,font=f_main,height=2)
-        
-        #GUI
-        upload_L.grid(row=0)
-        self.clipboardB.grid(row=1)
-        self.openFileB.grid(row=2)
-        backB.grid(row=4)
+        self.entries = []
+
+        for y in range(9):
+            for x in range(9):
+                box_value = 3 * (y//3) + (x//3)
+                self.entries.append(tk.Text(master=subgrid_frames[box_value]))
+                
+        for i, item in enumerate(self.entries):
+            y = i//9
+            x = i%9
+            grid(item, row=y%3, col=x%3, width=2, height=1, font_type='cell')
+
+        for i, subgrid in enumerate(subgrid_frames):
+            subgrid.grid(row=i//3,
+                         column=i%3,
+                         padx=5,
+                         pady=5)
+
+
+    def screen_upload(self):
+        self.reset_window()
+
+
+        self.open_file_button = tk.Button(text='Open file',command=self.open_image_file)
+        grid(self.open_file_button, row=0, col=0)
+
+        back_button = tk.Button(text="Back", command=self.screen_play_options)
+        grid(back_button, row=1, col=0)
+
         self.win.mainloop()
 
-    def s_upload_stage_2(self,image,button_type):
+
+    def open_image_file(self):
+
+        """
+        Opens a file dialog and displays the upload screen if a file is selected.
+        """
         try:
-            #Converting image
-            image_conversion = convert(image)
+            file_path = askopenfilename()
+            image = Image.open(file_path)
+            self.screen_check_grid_model(image)
+            
+        except FileNotFoundError:
+            self.open_file_button["fg"]='#FF0000'
+            print("File not found")
         
-            #Creating window
-            self.win.destroy()
-            self.win = tk.Tk()
-            self.win.title('')
-            self.win.resizable(False, False)
-            o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
-            self.win.iconphoto(False, o1x1_logo)
 
-            #Frame and style
-            frame0 = tk.Frame()
-            frame1 = tk.Frame(master=frame0)
-            frame2 = tk.Frame()
-            f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
-            label_w = 27
 
-            #Editable grid and photo
-            img_grid = ImageTk.PhotoImage(image_conversion.img.resize((280,280)))
-            ImgLabel = tk.Label(master=frame0,image=img_grid)
+    def screen_check_grid_model(self, image):
 
-            #Setting up and displaying grid
-            sg=[tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1),tk.Frame(master=frame1)]
-            self.entries = [tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[0],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[1],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[2],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[3],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[4],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[5],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[6],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[7],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3),tk.Entry(master=sg[8],width=3)]
-            for i,item in enumerate(self.entries):
-                y1 = i//9
-                x1 = i%9
-                item.grid(row=y1%3,column=x1%3)           
-            for i,item in enumerate(self.entries):
-                digit = image_conversion.ans[i]
-                if digit!='0':
-                    item.insert(0,image_conversion.ans[i])
-            for i, sub in enumerate(sg):
-                sub.grid(row=i//3,column=i%3,padx=5,pady=5)
+        self.reset_window()
 
-            #Buttons
-            backB = tk.Button(master=frame2,text='Back',command=self.screen_play_options,
-                font = f_main,width=label_w)
-            self.confirmB = tk.Button(master=frame2,text='Confirm',command=lambda:self.check_valid_grid_creation(image_conversion),
-                font = f_main,width=label_w)
-            backB.grid(row=0,column=0)
-            self.confirmB.grid(row=0,column=1)
+        # Sizing down image (width and height max 1080)
+        image_width = image.width
+        image_height = image.height
 
-            #GUI placements
-            ImgLabel.grid(row=0,column=1)
-            frame0.grid(row=0,column=0)
-            frame1.grid(row=0,column=0)
-            frame2.grid(row=1,column=0)
-            self.win.mainloop()
-        except:
+        max_size = 1440
 
-            #Disallowing generate
-            if button_type=='C':
-                self.clipboardB["fg"]='#FF0000'
-            elif button_type=='O':
-                self.openFileB["fg"]='#FF0000'
+        if image_width > image_height:
+            width = max_size
+            height = int(round(image_height * width / image_width))
+
+        else:
+            height = max_size
+            width = int(round(image_width * height / image_height))
+        
+        resized_image = image.resize((width, height))
+        imageTk = ImageTk.PhotoImage(resized_image)
+
+        # Building canvas and assigning events
+        self.canvas= tk.Canvas(width=width, height=height)
+        self.canvas.create_image(0, 0, image=imageTk, anchor="nw")
+        
+        self.canvas.bind("<Button-1>", self.left_click_canvas)
+        self.canvas.bind("<Button-3>", self.right_click_canvas)
+
+        grid(self.canvas, row=0, col=0)
+
+        # Canvas variables (for drawing on canvas)
+        self.left_canvas_cords = None
+        self.right_canvas_cords = None
+        self.identifiers = []
+
+        # Getting initial image bounds if possible
+        bounds = object_detection.process_canvas(resized_image, 'bounds')
+        if bounds is not None:
+            x1, y1, x2, y2 = bounds
+
+            self.left_canvas_cords = (x1, y1)
+            self.right_canvas_cords = (x2, y2)
+        
+        self.make_rectangle_canvas()
+        
+
+        # Confirm and back buttons
+        confirm_back_frame = tk.Frame()
+        
+        back_button = tk.Button(master=confirm_back_frame, text="Back", command = self.screen_upload)
+        self.confirm_button = tk.Button(master=confirm_back_frame, text="Confirm", command= lambda: self.screen_check_digit_model(resized_image)) 
+
+        grid(confirm_back_frame, row=1)
+        grid(back_button, row=0, col=0)
+        grid(self.confirm_button, row=0, col=1)
+
+        self.win.mainloop()
+
+
+    def left_click_canvas(self, event):
+        x, y = event.x, event.y
+        self.left_canvas_cords = (x,y)
+        self.make_rectangle_canvas()
+
+    def right_click_canvas(self, event):
+        x, y = event.x, event.y
+        self.right_canvas_cords = (x,y)
+        self.make_rectangle_canvas()
+        
+
+    def make_rectangle_canvas(self):
+        """
+        Update the canvas with a rectangle that represents the coordinates of the user's clicks.
+        If the user has clicked twice, the rectangle will be drawn between the two clicks.
+        If the user has clicked once, a small pixel will be drawn around the click.
+        """
+
+        # Clear previous rectangles
+        for identifier in self.identifiers:
+            self.canvas.delete(identifier)
+
+        # Update coordinates to ensure max
+        if self.left_canvas_cords and self.right_canvas_cords:
+
+            x1 = min(self.left_canvas_cords[0], self.right_canvas_cords[0])
+            y1 = min(self.left_canvas_cords[1], self.right_canvas_cords[1])
+
+            x2 = max(self.left_canvas_cords[0], self.right_canvas_cords[0])
+            y2 = max(self.left_canvas_cords[1], self.right_canvas_cords[1])
+
+            self.left_canvas_cords = (x1, y1)
+            self.right_canvas_cords = (x2, y2)
+
+            # Draw rectangle between the two clicks
+            self.identifiers.append(self.canvas.create_rectangle(
+                x1, y1, x2, y2, fill="", outline="red", width=2
+            ))
+
+        if self.left_canvas_cords:
+            # Draw small rectangle around left click
+            left_change = (self.left_canvas_cords[0] - 3, self.left_canvas_cords[1] - 3,
+                           self.left_canvas_cords[0] + 3, self.left_canvas_cords[1] + 3)
+            
+            self.identifiers.append(self.canvas.create_rectangle(
+                left_change, fill="green", width=2, outline="green"
+            ))
+
+        if self.right_canvas_cords:
+            # Draw small rectangle around right click
+            right_change = (self.right_canvas_cords[0] - 3, self.right_canvas_cords[1] - 3,
+                            self.right_canvas_cords[0] + 3, self.right_canvas_cords[1] + 3)
+
+            self.identifiers.append(self.canvas.create_rectangle(
+                right_change, fill="blue", width=2, outline="blue"
+            ))
+
+
+    def screen_check_digit_model(self, image):
+
+        if self.left_canvas_cords is None or self.right_canvas_cords is None:
+            self.confirm_button["fg"] = '#ff0000'
+            return
+
+        # Crop image
+        x1, y1 = self.left_canvas_cords
+        x2, y2 = self.right_canvas_cords
+
+        grid_image = image.crop((x1, y1, x2, y2))
+
+        grid_string = object_detection.process_grid(grid_image)
+
+        self.reset_window()
+
+        images_frame = tk.Frame()
+        grid_frame = tk.Frame(master = images_frame)
+
+        self.build_entry_grid(grid_frame)
+
+        for i, guess in enumerate(grid_string):
+            if guess != '0':          
+                self.entries[i].insert("1.0", guess)
+
+        resized_image = grid_image.resize((570, 570))
+
+        tk_image = ImageTk.PhotoImage(resized_image)
+        image_label = tk.Label(master=images_frame, image=tk_image)
+
+
+        grid(images_frame, row=0, col=0)
+        grid(grid_frame, row=0, col=0)
+
+
+        # Need to manually grid images
+        image_label.grid(row=0, column=1)
+
+
+        button_frame = tk.Frame()
+
+        back_button = tk.Button(text="Back", master=button_frame, command=self.screen_upload)
+        self.confirm_button = tk.Button(text="Confirm", master=button_frame, command= self.check_valid_grid_creation)
+
+        grid(back_button, row=0, col=0)
+        grid(self.confirm_button, row=0, col=1)
+       
+        grid(button_frame, row=1, col=0)
+
+        
+
+        
+        self.win.mainloop()
+
+
 
     def s_game(self,grid):
         #Setting up constraint solver for next move function
@@ -704,7 +823,7 @@ class front_end:
         quit_button.grid(row=7)
         self.win_window.mainloop()
 
-    def check_valid_grid_creation(self, upload=None):
+    def check_valid_grid_creation(self):
 
         grid = []
         for entry in self.entries:
@@ -738,16 +857,11 @@ class front_end:
 
             if result.sols == 1:
 
-                #If upload is enabled, save information
-                if upload!=None:
-                    if upload.max_predict>pval:
-                        upload.train(grid)
-
                 #Go to main game
                 self.s_game(grid_string)
             
             #If more than 1 solution, use generator and proceed to game
-            elif upload==None and result.sols==2:
+            elif result.sols==2:
 
 
                 difficulty = random.randint(0,len(gen_difficulty)-1)
@@ -759,15 +873,7 @@ class front_end:
 
                 #Error - display using confirm button
                 self.confirmB["fg"] = '#FF0000'
-                
-
-    def f_upload_open_file(self): 
-        #Get file name then upload screen
-        try:
-            file = askopenfilename()
-            self.s_upload_stage_2(Image.open(file),'B')
-        except:
-            self.openFileB["fg"]='#FF0000'
+            
 
     def f_get_hint(self,hint=True):
         #Getting grid from entries (and sorting at the same time)
@@ -1222,5 +1328,5 @@ class front_end:
 
 
 
-
 y = front_end()
+
