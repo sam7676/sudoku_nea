@@ -28,6 +28,7 @@ def attempt_login(json):
         playerID, token = database.attempt_login(username, password)
         send({"id":playerID, "token":token})
     except:
+        print("Login failed")
         send({"id":None, "token":None})
 
 # Attempts to login
@@ -40,9 +41,12 @@ def attempt_register(json):
         playerID, token = database.create_account(username, password)
         send({"id":playerID, "token":token})
     except:
+        print("Register failed")
         send({"id":None, "token":None})
 
-
+@socketio.on('submit_score')
+def submit_score(json):
+    print(json)
 
 
 
