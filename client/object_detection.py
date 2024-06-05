@@ -56,6 +56,7 @@ def process_grid(image):
 def process_canvas(image, return_type = 'grid'):
     results = grid_model(image)
     for result in results:
+        if len(result.boxes.xyxy) == 0: continue
 
         x1, y1, x2, y2 = result.boxes.xyxy[0].tolist()
 
