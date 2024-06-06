@@ -810,9 +810,6 @@ class front_end:
             if i%9 == 8:
                 grid.append(row)
                 row = []
-        
-
-        print_grid(grid, dims=3)
 
         correct = [0 for _ in range(9)]
 
@@ -889,12 +886,9 @@ class front_end:
                     if cell_answer not in cell:
                         grid[i][j].append(cell_answer)
                         grid[i][j].sort()
-
                 
             #Getting hint
             hint_type, hint_positions, hint_old, hint_new = constraint(grid).next_move
-
-            print(hint_type, hint_positions, hint_old, hint_new)
 
             #Set hint label to tell which move was just executed
             self.hint_button['text'] = move_dict[hint_type]

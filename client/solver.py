@@ -191,8 +191,9 @@ class constraint:
         self.ans = transfer_grid(self.ans, 3, 1)
 
         if self.next_move[0] == "Bowman":
-            y,x = self.next_move[1]
-            self.next_move[-1] = grid[y][x][0]
+            # Update answer
+            y,x = self.next_move[1][0]
+            self.next_move[-1] = [[self.ans[9*y+x]]]
 
     def return_cords(self,grid):
         #Returns co-ordinates of the cell with the minimal notes in it. Used for bowman
@@ -222,8 +223,8 @@ class constraint:
         if self.check_valid(grid):
             y1,x1, num = self.return_cords(grid)
 
-            if self.next_move == None:
-                self.next_move = ["Bowman", [(y1,x1)], grid[y1][x1], -1]
+            if not self.next_move:
+                self.next_move = ["Bowman", [(y1,x1)], [grid[y1][x1]], -1]
 
 
             for n in range(num):
