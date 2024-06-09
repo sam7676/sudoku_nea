@@ -46,7 +46,28 @@ def attempt_register(json):
 
 @socketio.on('submit_score')
 def submit_score(json):
-    print(json)
+
+    id = json["playerID"]
+    grid_time = json["grid_time"]
+    grid_string = json["grid_string"]
+    errors = json["errors"]
+    hints = json["hints"]
+
+
+    database.add_to_game(id, grid_string, grid_time, hints, errors)
+    send({"id":None, "token":None})
+
+@socketio.on('get_leaderboard_data')
+def get_leaderboard_data(json):
+
+    name = json["name"]
+    grid = json["grid"]
+
+    data = database.send_leaderboard_data(name, grid)
+
+    send({"result":data})
+    
+
 
 
 

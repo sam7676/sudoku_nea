@@ -294,7 +294,7 @@ class front_end:
 
             multiplayer_button = tk.Button(text="Multiplayer", command=lambda : None)
 
-            leaderboard_button = tk.Button(text="Leaderboard", command=lambda : None)
+            leaderboard_button = tk.Button(text="Leaderboard", command=self.screen_leaderboard)
 
             log_out_button = tk.Button(text="Log out", command=self.log_out)
 
@@ -1073,126 +1073,95 @@ class front_end:
 
 
 
-
-
-
-
-    def f_return_query(self):
-        #Setting style
-        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
-        title_relief = tk.RAISED
-        name_w = 16
-        grid_w = 20
-        date_w = 12
-        time_w = 10
-        play_w = 5
+    def process_query(self):
 
         #Deleting current widgets
         for child in self.query_frame.winfo_children():
             child.destroy()
 
-        #Setting title labels and frame
-        self.query_frame = tk.Frame(height=30)
-        results_queries = []
-        nameLbl = tk.Label(text='Name',master=self.query_frame,width=name_w,font=f_main,relief=title_relief)
-        gridLbl = tk.Label(text='Grid',master=self.query_frame,width=grid_w,font=f_main,relief=title_relief)
-        dateLbl = tk.Label(text='Date',master=self.query_frame,width=date_w,font=f_main,relief=title_relief)
-        timeLbl = tk.Label(text='Time',master=self.query_frame,width=time_w,font=f_main,relief=title_relief)
-        emptyLbl = tk.Button(text=' ',master=self.query_frame,font=f_main,width=play_w)
+        name = self.search_name_entry.get()
+        grid_string = self.search_grid_entry.get()
 
-        #Querying name, grid input
-        name = self.searchNameE.get()
-        grid = self.searchGridE.get()
-        results = search_result(name,grid)
+        name_label = tk.Label(text='Name',master=self.query_frame)
+        grid_label = tk.Label(text='Grid',master=self.query_frame)
+        date_label = tk.Label(text='Date',master=self.query_frame)
+        time_label = tk.Label(text='Time',master=self.query_frame)
+        hint_label = tk.Label(text='Hints',master=self.query_frame)
+        error_label = tk.Label(text='Errors',master=self.query_frame)
+        empty_label = tk.Label(text='',master=self.query_frame)
+
+        name_width = 10
+        grid_width = 10
+        date_width = 16
+        time_width = 10
+        hint_width = 4
+        error_width = 6
+
+        grid(name_label, row=0, col=0, width=name_width)
+        grid(grid_label, row=0, col=1, width=grid_width)
+        grid(date_label, row=0, col=2, width=date_width)
+        grid(time_label, row=0, col=3, width=time_width)
+        grid(hint_label, row=0, col=4, width=hint_width)
+        grid(error_label, row=0, col=5, width=error_width)
+
         
-        #GUI
-        nameLbl.grid(row=0,column=0)
-        gridLbl.grid(row=0,column=1)
-        dateLbl.grid(row=0,column=2)
-        timeLbl.grid(row=0,column=3)
-        emptyLbl.grid(row=0,column=4)
+        self.socket.emit('get_leaderboard_data', {"name": name, "grid":grid_string})
+        result = self.socket.receive()[1]
+
+        result = result["result"]
+
+        for i, res in enumerate(result):
+
+            name, grid_str, time, date, hints, errors = res
+
+            time = round(float(time), 2)
+
+            name_label = tk.Label(text=name,master=self.query_frame)
+            grid_label = tk.Label(text=grid_str,master=self.query_frame)
+            date_label = tk.Label(text=date,master=self.query_frame)
+            time_label = tk.Label(text=time,master=self.query_frame)
+            hint_label = tk.Label(text=hints,master=self.query_frame)
+            error_label = tk.Label(text=errors,master=self.query_frame)
+
+            grid(name_label, row=i+1, col=0, width=name_width)
+            grid(grid_label, row=i+1, col=1, width=grid_width)
+            grid(date_label, row=i+1, col=2, width=date_width)
+            grid(time_label, row=i+1, col=3, width=time_width)
+            grid(hint_label, row=i+1, col=4, width=hint_width)
+            grid(error_label, row=i+1, col=5, width=error_width)
         
-        #Adding all results of query to window
-        try:
-            results_queries.append([tk.Label(text=results[0][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[0][1],master=self.query_frame,anchor="w",width=grid_w,font=f_main),tk.Label(text=results[0][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f"{int(results[0][3]//60)}m {int(round(results[0][3]%60))}s",master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[0][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[1][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[1][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[1][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[1][3]//60)}m {int(round(results[1][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[1][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[2][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[2][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[2][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[2][3]//60)}m {int(round(results[2][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[2][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[3][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[3][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[3][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[3][3]//60)}m {int(round(results[3][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[3][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[4][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[4][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[4][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[4][3]//60)}m {int(round(results[4][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[4][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[5][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[5][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[5][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[5][3]//60)}m {int(round(results[5][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[5][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[6][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[6][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[6][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[6][3]//60)}m {int(round(results[6][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[6][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[7][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[7][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[7][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[7][3]//60)}m {int(round(results[7][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[7][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[8][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[8][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[8][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[8][3]//60)}m {int(round(results[8][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[8][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[9][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[9][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[9][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[9][3]//60)}m {int(round(results[9][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[9][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[10][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[10][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[10][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[10][3]//60)}m {int(round(results[10][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[10][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[11][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[11][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[11][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[11][3]//60)}m {int(round(results[11][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[11][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[12][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[12][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[12][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[12][3]//60)}m {int(round(results[12][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[12][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[13][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[13][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[13][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[13][3]//60)}m {int(round(results[13][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[13][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-            results_queries.append([tk.Label(text=results[14][0],master=self.query_frame,width=name_w,font=f_main),tk.Label(text=results[14][1],master=self.query_frame,anchor='w',width=grid_w,font=f_main),tk.Label(text=results[14][2],master=self.query_frame,width=date_w,font=f_main),tk.Label(text=f'{int(results[14][3]//60)}m {int(round(results[14][3]%60))}s',master=self.query_frame,width=time_w,font=f_main),tk.Button(text='Play',command=lambda:self.screen_game(results[14][1]),master=self.query_frame,width=play_w,font=f_main,relief=title_relief)])
-        except:
-            pass
-        
-        #Adding empty labels (to ensure height is constant for all queries)
-        for i in range(len(results_queries),15):
-            results_queries.append([tk.Label(text=' ',master=self.query_frame,width=name_w,font=f_main),tk.Label(text=' ',master=self.query_frame,anchor="w",width=grid_w,font=f_main),tk.Label(text=' ',master=self.query_frame,width=date_w,font=f_main),tk.Label(text=' ',master=self.query_frame,width=time_w,font=f_main),tk.Button(text=' ',master=self.query_frame,width=play_w,font=f_main,relief=tk.FLAT)])
-
-        #Placing
-        for i, result in enumerate(results_queries):
-            for j in range(len(result)):
-                result[j].grid(row=i+1,column=j)
-
-        #Placing in window
-        self.query_frame.grid(row=2,column=0)
-
-
 
 
     
-    def s_leaderboard(self):
-        #Create window and set style
-        self.win.destroy()
-        self.win = tk.Tk()
-        self.win.title('')
-        self.win.resizable(False, False)
-        o1x1_logo = ImageTk.PhotoImage(Image.open(img_1x1))
-        self.win.iconphoto(False, o1x1_logo)
-        f_main = font.Font(family="TkDefaultFont",size=10,weight="normal")
-        name_w = 16
-        grid_w = 20
+    def screen_leaderboard(self):
+        
+        self.reset_window()
 
-        #Leaderboard image and frames
-        leaderboard_image = ImageTk.PhotoImage(Image.open(img_lb))
-        leaderboardL = tk.Label(image=leaderboard_image)
-        frame1 = tk.Frame()
-        miniFrame1 = tk.Frame(master=frame1)
-        miniFrame2 = tk.Frame(master=frame1)
+        options_frame = tk.Frame()
+        grid(options_frame, row=0)
 
-        #Search frames
-        searchNameB = tk.Label(master=miniFrame1,text='Search name',font=f_main,width=name_w)
-        self.searchNameE = tk.Entry(master=miniFrame1,width=name_w)
-        searchGridB = tk.Label(master=miniFrame1,text='Search grid',font=f_main,width=grid_w)
-        self.searchGridE = tk.Entry(master=miniFrame1,width=grid_w)
-        searchB = tk.Button(text='Search',command=self.f_return_query,master=miniFrame2,height=2,font=f_main,width=14)
-        backB = tk.Button(text='Back',command=self.screen_home,master=miniFrame2,height=2,font=f_main,width=14)
 
-        #GUI stuff
-        leaderboardL.grid(row=0)
-        frame1.grid(row=1)
-        searchNameB.grid(row=0,column=0)
-        self.searchNameE.grid(row=1,column=0)
-        searchGridB.grid(row=0,column=1)
-        self.searchGridE.grid(row=1,column=1)
-        searchB.grid(row=0,column=0)
-        backB.grid(row=0,column=1)
-        miniFrame1.grid(row=0,column=0)
-        miniFrame2.grid(row=0,column=1)
-        self.query_frame = tk.Frame()
+        search_name_label = tk.Label(text='Search name', master=options_frame)
+        self.search_name_entry = tk.Entry(master=options_frame)
+        search_grid_label = tk.Label(text='Search grid', master=options_frame)
+        self.search_grid_entry = tk.Entry(master=options_frame)
+
+        search_button = tk.Button(text='Search',command=self.process_query, master=options_frame)
+        back_button = tk.Button(text='Back',command=self.screen_home, master=options_frame)
+
+        grid(search_name_label, row=0, col=0, width=15)
+        grid(self.search_name_entry, row=0, col=1, width=15)
+        grid(search_grid_label, row=0, col=2, width=15)
+        grid(self.search_grid_entry, row=0, col=3, width=15)
+        grid(search_button, row=0, col=4, width=8)
+        grid(back_button, row=0, col=5, width=8)
+
+
+        self.query_frame = tk.Frame(height=30)
+
+        grid(self.query_frame, row=2)
+
         self.win.mainloop()
-
-
-
-
-
 
 
 

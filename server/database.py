@@ -89,6 +89,8 @@ def create_db():
                    Grid            TEXT NOT NULL,
                    Time            TEXT NOT NULL,
                    Date            TEXT NOT NULL,
+                   Hints           INTEGER NOT NULL,
+                   Errors          INTEGER NOT NULL,
                    FOREIGN KEY(PlayerID) REFERENCES Accounts(PlayerID)
                    );''')
     
@@ -145,6 +147,8 @@ def reset_db():
                    Grid            TEXT NOT NULL,
                    Time            TEXT NOT NULL,
                    Date            TEXT NOT NULL,
+                   HINTS           INTEGER NOT NULL,
+                   ERRORS          INTEGER NOT NULL,
                    FOREIGN KEY(PlayerID) REFERENCES Accounts(PlayerID)
                    );''')
     
@@ -273,6 +277,45 @@ def create_access_token(cursor, playerID):
     cursor.execute('INSERT INTO AccessTokens (AccessToken, PlayerID, DATE) VALUES (?, ?, ?)', (token, playerID, date))
 
     return token
+
+
+def add_to_game(playerID, grid, time, hints, errors):
+
+    connection, cursor = create_connection()
+
+    cursor.execute('INSERT INTO Games (PlayerID, Grid, Time, Date, HINTS, ERRORS) VALUES (?, ?, ?, ?, ?, ?)', 
+                   (playerID, grid, time, get_date(), hints, errors))
+
+    close_connection(connection, cursor)
+    
+
+def get_username(cursor, playerID):
+
+    query = cursor.execute('SELECT Username FROM Accounts WHERE PlayerID = ?', (playerID,))
+
+    return query.fetchone()[0]
+
+
+def send_leaderboard_data(name, grid):
+
+    connection, cursor = create_connection()
+
+    #TODO
+    
+    if grid == '':
+        grid = '%'
+
+    query = cursor.execute(
+    'SELECT Accounts.Username, Games.Grid, Games.Time, Games.Date, Games.Hints, Games.Errors FROM Accounts INNER JOIN Games ON Accounts.PlayerID = Games.PlayerID WHERE Accounts.Username LIKE ? AND Games.Grid LIKE ? ORDER BY Games.Time',
+            (name+'%', grid))
+
+
+    result = query.fetchmany(15)
+
+    close_connection(connection, cursor)
+
+    return result
+
 
 
 
