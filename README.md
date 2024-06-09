@@ -23,9 +23,9 @@ So far, I have:
 - implemented an account system with logins
 - separated the project into a client exe and a server application to support multiple users running the same server
 - used the YOLO algorithm for object detection instead of R-CNN, leading to a speed increase of roughly 10x over the previous version
+- rewrote the code base, cleaning up messy design patterns implemented a few years ago
 
 To-do - I am currently working on/look to improve in the future:   
-- rewriting the codebase to clean up any messiness set from a few years ago
 - improving the app's UI
 - introducing multiplayer
 - adding support for killer sudoku
