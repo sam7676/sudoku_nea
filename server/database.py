@@ -4,6 +4,7 @@ import datetime
 import hashlib #Python's hash function is non-deterministic, so this is necessary
 import random
 import os
+import grid_generator
 
 # Note 1: an image file referencing the design of the database system and table relationships
 # can be seen in this directory
@@ -77,10 +78,15 @@ def create_db():
                    FOREIGN KEY(PlayerID) REFERENCES Accounts(PlayerID)
                    );''')
     
+    # This breaks normalisation
     cursor.execute('''CREATE TABLE Matches(
                    MatchID INTEGER PRIMARY KEY, 
                    Grid TEXT NOT NULL, 
-                   Date TEXT NOT NULL
+                   Date TEXT NOT NULL,
+                   Player1 INTEGER NOT NULL,
+                   Player2 INTEGER NOT NULL,
+                   Socket1 TEXT NOT NULL,
+                   Socket2 TEXT NOT NULL
                    );''')
     
     cursor.execute('''CREATE TABLE Games(
@@ -119,52 +125,10 @@ def reset_db():
     cursor.execute('DROP TABLE IF EXISTS Games')
     cursor.execute('DROP TABLE IF EXISTS Accounts') #last
 
-
-    cursor.execute('''CREATE TABLE Accounts(
-                   PlayerID INTEGER PRIMARY KEY, 
-                   Username TEXT NOT NULL, 
-                   Password TEXT NOT NULL, 
-                   ELO INTEGER NOT NULL, 
-                   Date TEXT NOT NULL
-                   );''')
-    
-    cursor.execute('''CREATE TABLE AccessTokens(
-                   AccessToken TEXT PRIMARY KEY,
-                   PlayerID INTEGER NOT NULL, 
-                   Date TEXT NOT NULL,
-                   FOREIGN KEY(PlayerID) REFERENCES Accounts(PlayerID)
-                   );''')
-    
-    cursor.execute('''CREATE TABLE Matches(
-                   MatchID INTEGER PRIMARY KEY, 
-                   Grid TEXT NOT NULL, 
-                   Date TEXT NOT NULL
-                   );''')
-    
-    cursor.execute('''CREATE TABLE Games(
-                   GameID          INTEGER PRIMARY KEY,
-                   PlayerID        INTEGER NOT NULL,
-                   Grid            TEXT NOT NULL,
-                   Time            TEXT NOT NULL,
-                   Date            TEXT NOT NULL,
-                   HINTS           INTEGER NOT NULL,
-                   ERRORS          INTEGER NOT NULL,
-                   FOREIGN KEY(PlayerID) REFERENCES Accounts(PlayerID)
-                   );''')
-    
-    cursor.execute('''CREATE TABLE MultiplayerResults(
-                   MultiplayerID   INTEGER PRIMARY KEY,
-                   MatchID         INTEGER NOT NULL,
-                   PlayerID        INTEGER NOT NULL,
-                   Time            TEXT NOT NULL,
-                   OldELO          INTEGER NOT NULL,
-                   NewELO          INTEGER NOT NULL,
-                   Winner          INTEGER NOT NULL,
-                   FOREIGN KEY(MatchID) REFERENCES Accounts(MatchID),
-                   FOREIGN KEY(PlayerID) REFERENCES Accounts(PlayerID)
-                   );''')
-    
     close_connection(connection, cursor)
+
+    create_db()
+
 
 
 
@@ -254,7 +218,7 @@ def check_access_token_validity(token):
 
         date = get_DateTime_object(result[2])
 
-        past = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=5)
+        past = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=1)
 
         if date >= past:
             playerID = result[1]
@@ -283,7 +247,7 @@ def add_to_game(playerID, grid, time, hints, errors):
 
     connection, cursor = create_connection()
 
-    cursor.execute('INSERT INTO Games (PlayerID, Grid, Time, Date, HINTS, ERRORS) VALUES (?, ?, ?, ?, ?, ?)', 
+    cursor.execute('INSERT INTO Games (PlayerID, Grid, Time, Date, Hints, Errors) VALUES (?, ?, ?, ?, ?, ?)', 
                    (playerID, grid, time, get_date(), hints, errors))
 
     close_connection(connection, cursor)
@@ -317,6 +281,59 @@ def send_leaderboard_data(name, grid):
     return result
 
 
+
+
+def create_match(player_id_1, player_id_2, socket_id_1, socket_id_2):
+
+    connection, cursor = create_connection()
+
+    grid = grid_generator.generate([100, 2]).ans
+
+    cursor.execute('INSERT INTO Matches (Grid, Date, Player1, Player2, Socket1, Socket2) VALUES (?, ?, ?, ?, ?, ?)', 
+                   (grid, get_date(), player_id_1, player_id_2, socket_id_1, socket_id_2))
+
+    match_id = cursor.lastrowid
+
+    close_connection(connection, cursor)
+
+    return match_id, grid
+
+def get_match_details(match_id):
+
+    connection, cursor = create_connection()
+
+    query = cursor.execute('SELECT Player1, Player2, Socket1, Socket2 FROM Matches WHERE MatchID = ?', (match_id,))
+
+    result = query.fetchone()
+
+    close_connection(connection, cursor)
+
+    return result
+
+
+def log_multiplayer_result(player_id, match_id, old_elo, new_elo, time, win):
+
+    connection, cursor = create_connection()
+
+    win = 1 if win else 0
+
+    cursor.execute('INSERT INTO MultiplayerResults (MatchID, PlayerID, Time, OldELO, NewELO, Winner) VALUES (?, ?, ?, ?, ?, ?)', 
+                   (match_id, player_id, time, old_elo, new_elo, win))
+
+    close_connection(connection, cursor)
+
+
+def get_player_elo(player_id):
+
+    connection, cursor = create_connection()
+
+    query = cursor.execute('SELECT ELO FROM Accounts WHERE PlayerID = ?', (player_id,))
+
+    result = query.fetchone()[0]
+
+    close_connection(connection, cursor)
+
+    return result
 
 
 

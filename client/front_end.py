@@ -10,6 +10,7 @@ from tkinter.filedialog import askopenfilename
 from datetime import date
 from tkinter import font
 from collections import defaultdict
+import threading
 
 import socketio
 
@@ -136,6 +137,7 @@ class front_end:
                 self.playerID = result
 
         except:
+
             self.socket = None
             self.online_mode = False
 
@@ -292,7 +294,7 @@ class front_end:
 
         if self.online_mode:
 
-            multiplayer_button = tk.Button(text="Multiplayer", command=lambda : None)
+            multiplayer_button = tk.Button(text="Multiplayer", command=self.queue_multiplayer)
 
             leaderboard_button = tk.Button(text="Leaderboard", command=self.screen_leaderboard)
 
@@ -1008,30 +1010,36 @@ class front_end:
 
         self.final_time = self.timer_end - self.timer_start
 
-        self.new_window = tk.Tk()
+        if self.multiplayer is None:
 
-        congrats_label = tk.Label(text=f"Congratulations! You won in {self.time_to_string(self.final_time)}",
-                                  master=self.new_window)
+            self.new_window = tk.Tk()
 
-        congrats_label.grid(row=0)
+            congrats_label = tk.Label(text=f"Congratulations! You won in {self.time_to_string(self.final_time)}",
+                                    master=self.new_window)
 
-        error_total = tk.Label(master=self.new_window,text=f'Errors: {self.errors}')
-        hint_total = tk.Label(master=self.new_window,text=f'Hints: {self.hints}')
+            congrats_label.grid(row=0)
 
-        error_total.grid(row=1)
-        hint_total.grid(row=2)
+            error_total = tk.Label(master=self.new_window,text=f'Errors: {self.errors}')
+            hint_total = tk.Label(master=self.new_window,text=f'Hints: {self.hints}')
 
-        quit_button = tk.Button(text="Quit", 
-                                command=self.new_window.destroy,
-                                master=self.new_window)
-        
-        quit_button.grid(row=3)
+            error_total.grid(row=1)
+            hint_total.grid(row=2)
 
-        if self.online_mode:
+            quit_button = tk.Button(text="Quit", 
+                                    command=self.new_window.destroy,
+                                    master=self.new_window)
             
-            quit_button.configure(command=self.submit_score)
+            quit_button.grid(row=3)
 
-        self.new_window.mainloop()
+            if self.online_mode:
+                
+                quit_button.configure(command=self.submit_score)
+
+            self.new_window.mainloop()
+
+        else:
+
+            self.socket.emit('win_game', {'match_id': self.multiplayer, "time":self.final_time})
         
     def submit_score(self):
 
@@ -1164,6 +1172,57 @@ class front_end:
         self.win.mainloop()
 
 
+
+
+
+    def queue_multiplayer(self):
+
+        self.socket.emit('queue_multiplayer', {'id': self.playerID})
+
+        result = self.socket.receive()[1]
+
+        match_id = result["match_id"]
+
+        grid_string = result["grid"]
+
+        self.multiplayer = match_id
+
+        self.start_multiplayer_listener()
+
+        self.screen_game(grid_string)
+
+
+    def start_multiplayer_listener(self):
+
+        listener_thread = threading.Thread(target=self.multiplayer_listener)
+        listener_thread.start()
+        
+
+
+
+    def multiplayer_listener(self):
+        
+        event = self.socket.receive()[1]
+
+        winner_status = event["winner"]
+
+        self.multiplayer = None
+
+        self.disable_game_buttons()
+
+        if winner_status:
+
+            winner_label = tk.Label(text='You win!')
+
+            grid(winner_label, row=0, col=0)
+
+        else:
+
+            loser_label = tk.Label(text="You lose :(")
+
+            grid(loser_label, row=0, col=0)
+
+    
 
 
 
