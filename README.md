@@ -24,10 +24,11 @@ So far, I have:
 - separated the project into a client exe and a server application to support multiple users running the same server
 - used the YOLO algorithm for object detection instead of R-CNN, leading to a speed increase of roughly 10x over the previous version
 - rewrote the code base, cleaning up messy design patterns implemented a few years ago
+- introduced multiplayer and an ELO system
 
 To-do - I am currently working on/look to improve in the future:   
 - improving the app's UI
-- introducing multiplayer
+- adding play-together games
 - adding support for killer sudoku
 - adding a killer sudoku solver
 - adding a killer sudoku object detection system
@@ -41,12 +42,12 @@ To-do - I am currently working on/look to improve in the future:
 - **Leaderboard**: Each grid contains a leaderboard with name and time taken to solve
 - **Object detection system**: Takes an image as input and processes any Sudoku grids within the image into the app
 - **Account**: Contains recent games played and time taken. Necessary for multiplayer
+- **Multiplayer matches**: Two users will be matched together and assigned a grid, with the aim to complete the grid before the other.
+- **ELO ranking system**: Matches will have the option to be competitive, using an ELO system to amend rankings after each match
 
 ---
 
 ### Upcoming features
-- **Multiplayer matches**: Two users will be matched together and assigned a grid, with the aim to complete the grid before the other.
-- **ELO ranking system**: Matches will have the option to be competitive, using an ELO system to amend rankings after each match
 - **Multiplayer play-together**: Users will be able to collaborate together on a grid, sharing notes in real-time
 - **Killer Sudoku**: Will implement Killer Sudoku once I've done all the above
 
