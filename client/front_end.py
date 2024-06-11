@@ -1,5 +1,3 @@
-from solver import *
-
 from time import perf_counter
 from PIL import Image
 from PIL import ImageTk
@@ -7,27 +5,17 @@ import random
 import pyautogui as pg                          # This for some reason modifies the font
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
-from datetime import date
 from tkinter import font
 from collections import defaultdict
 import threading
-
 import socketio
 
+import solver
 import object_detection
 
 
 image_location =        'images'
-img_logo =              'images\\logo.png'
-img_lb =                'images\\leaderboard.png'
-img_optns =             'images\\options.png'
-img_upload =            'images\\upload.png'
-img_win =               'images\\win.png'
-img_train =             'images\\train.png'
-img_generate =          'images\\generate.png'
 img_1x1 =               'images\\1x1.png'
-img_custom =            'images\\custom.png'
-
 
 
 
@@ -39,16 +27,6 @@ move_dict = {
     "Bowman":'Hint: Bowman Bingo',
     "Remove":'Hint: Remove note',
 }
-
-
-
-
-
-def convert(): pass
-def clear_table(): pass
-def search_result(): pass   
-def add_result(): pass
-def train(): pass
 
 
 use_square_boxes = False
@@ -419,7 +397,7 @@ class front_end:
             # checking only 1 solution to grid
             grid_string = ''.join(grid)
 
-            result = algorithm_x(grid_string)
+            result = solver.algorithm_x(grid_string)
 
             if result.sols == 1:
 
@@ -432,7 +410,7 @@ class front_end:
 
                 difficulty = random.randint(0,len(gen_difficulty)-1)
 
-                self.screen_game(generate(gen_difficulty[difficulty],
+                self.screen_game(solver.generate(gen_difficulty[difficulty],
                                      grid_string).ans)
                 
             else:
@@ -677,7 +655,7 @@ class front_end:
     # Game screen
     def screen_game(self,grid_string):
 
-        self.game_solution = constraint(grid_string)
+        self.game_solution = solver.constraint(grid_string)
         self.grid_input = grid_string
         self.hints =0
         self.errors = 0
@@ -890,7 +868,7 @@ class front_end:
                         grid[i][j].sort()
                 
             #Getting hint
-            hint_type, hint_positions, hint_old, hint_new = constraint(grid).next_move
+            hint_type, hint_positions, hint_old, hint_new = solver.constraint(grid).next_move
 
             #Set hint label to tell which move was just executed
             self.hint_button['text'] = move_dict[hint_type]
@@ -1065,7 +1043,7 @@ class front_end:
 
         difficulty_array = []
         for i in range(4):
-            difficulty_button = tk.Button(text=f'Level {i+1}',command=lambda:self.screen_game(generate(gen_difficulty[i]).ans))
+            difficulty_button = tk.Button(text=f'Level {i+1}',command=lambda:self.screen_game(solver.generate(gen_difficulty[i]).ans))
             grid(difficulty_button, row=i, col=0)
             difficulty_array.append(difficulty_button)
         
