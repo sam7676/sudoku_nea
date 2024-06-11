@@ -9,3 +9,4 @@ runs
 server/yolo_inference.py
 server/digit_inference.py
 server/database.sqlite3
+server/coloured_image_seg.py
