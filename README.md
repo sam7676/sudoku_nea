@@ -10,13 +10,6 @@ Since then, I have been continually building this project, working on implementi
 
 ---
 
-### Legacy (working) version
-Please note the current repository may not run/be fully functional as I work on adding new features.   
-If you would like to try out the legacy version of this application, check out the link below:  
-
-https://github.com/sam7676/sudoku_nea/tree/df9d3c556937f8632f38d3170dc2bb4d8edaa396   
-
----
 ### Current state
 This project is currently being expanded heavily.   
 So far, I have:   
@@ -45,10 +38,16 @@ To-do - I am currently working on/look to improve in the future:
 - **Multiplayer matches**: Two users will be matched together and assigned a grid, with the aim to complete the grid before the other.
 - **ELO ranking system**: Matches will have the option to be competitive, using an ELO system to amend rankings after each match
 
----
+--- 
 
 ### Upcoming features
 - **Multiplayer play-together**: Users will be able to collaborate together on a grid, sharing notes in real-time
 - **Killer Sudoku**: Will implement Killer Sudoku once I've done all the above
+
+---
+
+### Legacy version
+
+https://github.com/sam7676/sudoku_nea/tree/df9d3c556937f8632f38d3170dc2bb4d8edaa396  
 
 ---
