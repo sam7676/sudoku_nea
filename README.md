@@ -1,4 +1,5 @@
 # sudoku_nea / sudoku_ai
+Sudoku game and solver, with image processing pipeline, automatic grid generation and hints.
 
 ---
 
