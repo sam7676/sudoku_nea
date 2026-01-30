@@ -1,4 +1,4 @@
-# sudoku_nea / sudoku_ai
+# sudoku_nea
 ---
 
 ### Description
@@ -10,15 +10,14 @@ Since then, I have been continually building this project, working on implementi
 ---
 
 ### Current state
-This project is currently being expanded heavily.   
-So far, I have:   
+Latest updates:
 - implemented an account system with logins
 - separated the project into a client exe and a server application to support multiple users running the same server
 - used the YOLO algorithm for object detection instead of R-CNN, leading to a speed increase of roughly 10x over the previous version
 - rewrote the code base, cleaning up messy design patterns implemented a few years ago
 - introduced multiplayer and an ELO system
 
-To-do - I am currently working on/look to improve in the future:   
+Future work:   
 - improving the app's UI
 - adding play-together games
 - adding support for killer sudoku
